@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     Button signUp;
     ImageButton thwakz;
     ImageView SignInForeground;
-
+    Boolean isSign;
     LinearLayout layout;
 
 
@@ -30,24 +30,38 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        signIn = findViewById(R.id.signIn);
-        signUp = findViewById(R.id.signUpText);
+
+        isSign = false;
+
         SignInForeground = findViewById(R.id.signInForeground);
         layout = findViewById(R.id.layout);
+        signUp = findViewById(R.id.signUpText);
         thwakz = findViewById(R.id.thwakzLogo);
+        signIn = findViewById(R.id.signIn);
+
         layout.setVisibility(View.INVISIBLE);
         SignInForeground.setVisibility(View.INVISIBLE);
+
         signUp.setOnClickListener(v -> {
             Intent intent = new Intent(this, SignUp.class);
             startActivity(intent);
         });
+
         signIn.setOnClickListener(v -> {
-            layout.setVisibility(View.VISIBLE);
-            SignInForeground.setVisibility(View.VISIBLE);
+
+            if (isSign) {
+                //Validate then sign in the user
+            } else {
+                isSign = true;
+                layout.setVisibility(View.VISIBLE);
+                SignInForeground.setVisibility(View.VISIBLE);
+            }
         });
+
         thwakz.setOnClickListener(v -> {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org")));
         });
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

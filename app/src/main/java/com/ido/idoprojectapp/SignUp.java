@@ -22,6 +22,8 @@ public class SignUp extends AppCompatActivity {
     EditText usernameET, emailET, passET, rePassET;
     Button signUp;
 
+    HelperUserDB hudb;
+
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
                     "(?=.*[0-9])" +         //at least 1 digit
@@ -37,6 +39,8 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sign_up);
+
+        hudb = new HelperUserDB(this);
 
         thwakz = findViewById(R.id.thwakzLogo);
         usernameET = findViewById(R.id.usrET);
