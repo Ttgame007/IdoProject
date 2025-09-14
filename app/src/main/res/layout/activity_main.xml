@@ -133,6 +133,8 @@
             android:hint="Password"
             android:inputType="textPassword"
             android:textColor="@color/blue" />
+
+
     </LinearLayout>
 
     <Button
@@ -172,7 +174,7 @@
         app:layout_constraintEnd_toEndOf="@+id/foreground"
         app:layout_constraintStart_toStartOf="@id/foreground"
         app:layout_constraintTop_toTopOf="@+id/foreground" />
-    <ImageView
+    <ImageButton
         android:id="@+id/thwakzLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -180,6 +182,7 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:backgroundTint="@color/blue"
         app:srcCompat="@drawable/thwakz" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,9 +1,11 @@
 package com.ido.idoprojectapp;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -17,10 +19,11 @@ public class MainActivity extends AppCompatActivity {
 
     Button signIn;
     Button signUp;
-
+    ImageButton thwakz;
     ImageView SignInForeground;
 
     LinearLayout layout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         signUp = findViewById(R.id.signUpText);
         SignInForeground = findViewById(R.id.signInForeground);
         layout = findViewById(R.id.layout);
+        thwakz = findViewById(R.id.thwakzLogo);
         layout.setVisibility(View.INVISIBLE);
         SignInForeground.setVisibility(View.INVISIBLE);
         signUp.setOnClickListener(v -> {
@@ -40,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         signIn.setOnClickListener(v -> {
             layout.setVisibility(View.VISIBLE);
             SignInForeground.setVisibility(View.VISIBLE);
+        });
+        thwakz.setOnClickListener(v -> {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org")));
         });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
