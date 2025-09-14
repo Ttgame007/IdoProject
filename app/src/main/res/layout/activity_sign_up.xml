@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blue"
+    tools:context=".SignUp">
+
+    <TextView
+        android:id="@+id/createTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:textSize="60dp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:text="Create an account"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/thwakzLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/thwakz" />
+    <Button
+        android:id="@+id/signUp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="80dp"
+        android:backgroundTint="@color/white"
+        android:text="Sign Up"
+        android:textColor="@color/blue"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="522dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/signUp"
+        app:layout_constraintTop_toBottomOf="@id/createTV"
+        tools:layout_editor_absoluteX="1dp"
+
+        tools:layout_editor_absoluteY="251dp">
+        <TextView
+            android:id="@+id/usrTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_weight="0"
+            android:text="Username" />
+
+
+        <EditText
+            android:id="@+id/usrET"
+            android:layout_width="363dp"
+            android:layout_weight="0"
+            android:layout_height="58dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:ems="10"
+            android:hint="Username"
+            android:inputType="text"
+            android:textColor="@color/blue" />
+        <TextView
+            android:id="@+id/emailTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_weight="0"
+            android:text="E-Mail" />
+
+
+        <EditText
+            android:id="@+id/emailET"
+            android:layout_width="363dp"
+            android:layout_weight="0"
+            android:layout_height="58dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:ems="10"
+            android:hint="E-Mail"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/blue" />
+        <TextView
+            android:id="@+id/passTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_weight="0"
+            android:text="Password" />
+
+
+        <EditText
+            android:id="@+id/passET"
+            android:layout_width="363dp"
+            android:layout_weight="0"
+            android:layout_height="58dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColor="@color/blue" />
+        <TextView
+            android:id="@+id/rePassTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_weight="0"
+            android:text="Repeat password" />
+
+
+        <EditText
+            android:id="@+id/rePassET"
+            android:layout_width="363dp"
+            android:layout_weight="0"
+            android:layout_height="58dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColor="@color/blue" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
