@@ -2,6 +2,7 @@ package com.ido.idoprojectapp;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class AiActivity extends AppCompatActivity {
     Button logOut;
+    TextView welcomeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,10 +20,17 @@ public class AiActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ai);
 
+        //inisializing variables
         logOut = findViewById(R.id.button);
+        welcomeText = findViewById(R.id.TVguest);
 
+        //welcome text with username
+        PrefsHelper prefs = new PrefsHelper(this);
+        String username = prefs.getUsername();
+        welcomeText.setText(username);
+
+        //log out test function delete and move later
         logOut.setOnClickListener(v -> {
-                    PrefsHelper prefs = new PrefsHelper(this);
                     prefs.clearCardensials();
                     finish();
                 });
