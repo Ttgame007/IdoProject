@@ -73,10 +73,14 @@ public class SignUp extends AppCompatActivity {
         } else if (!Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) {
             emailET.setError("Please enter a valid email address");
             return false;
+        }         else if (hudb.checkEmail(emailInput)) {
+            emailET.setError("Email already exists");
+            return false;
         } else {
             emailET.setError(null);
             return true;
         }
+
     }
 
     private boolean validatePassword() {
@@ -112,8 +116,16 @@ public class SignUp extends AppCompatActivity {
 
     private void validateFields() {
         if (validateEmail() && validatePassword() && validateRepeatPassword()) {
-            User user = new User(usernameET.getText().toString(), passET.getText().toString(), emailET.getText().toString());
-            // Now sign up USER
+            String username = usernameET.getText().toString();
+            String password = passET.getText().toString();
+            String email = emailET.getText().toString();
+            PrefsHelper prefs = new PrefsHelper(this);
+            User user = new User(username, email , password);
+            hudb.insertUser(user);
+            prefs.saveCardensials(username, password);
+            finish();
+            Intent intent = new Intent(this, AiActivity.class);
+            startActivity(intent);
         }
     }
 }
