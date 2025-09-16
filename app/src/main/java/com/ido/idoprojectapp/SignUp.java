@@ -1,6 +1,7 @@
 package com.ido.idoprojectapp;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -48,6 +49,10 @@ public class SignUp extends AppCompatActivity {
         passET = findViewById(R.id.passET);
         rePassET = findViewById(R.id.rePassET);
         signUp = findViewById(R.id.signUp);
+
+        //ui too probelmatic if i bhave time fix this later this line is to force protrait couse horizontal is messing up the views
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         thwakz.setOnClickListener(v -> {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org")));
