@@ -39,9 +39,35 @@ public class AiActivity extends AppCompatActivity {
 
         //welcome text with username
         PrefsHelper prefs = new PrefsHelper(this);
+        setupWelocome(prefs);
+
+
+        setupDrawer();
+
+        //log out test function delete and move later
+        logOut.setOnClickListener(v -> {
+                    logOut();
+                });
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+
+    public void logOut(){
+        PrefsHelper prefs = new PrefsHelper(this);
+        prefs.clearCardensials();
+        finish();
+    }
+
+    public void setupWelocome(PrefsHelper prefs){
         String username = prefs.getUsername();
         welcomeText.setText(username);
-
+    }
+    public void setupDrawer(){
         //adds a slider effect that pushes the screen when the drawer opens
         drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
@@ -61,22 +87,6 @@ public class AiActivity extends AppCompatActivity {
             }
             return false;
         });
-
-
-        //log out test function delete and move later
-        logOut.setOnClickListener(v -> {
-                    logOut();
-                });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
     }
-    public void logOut(){
-        PrefsHelper prefs = new PrefsHelper(this);
-        prefs.clearCardensials();
-        finish();
-    }
+
 }

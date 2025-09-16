@@ -1,6 +1,6 @@
 # Thwakz AI App
 
-A mobile app designed to run lightweight and larger AI models efficiently, depending on the device specs.
+A mobile app designed to run lightweight and larger AI models locally efficiently.
 
 ---
 
