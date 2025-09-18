@@ -41,6 +41,7 @@ public class HelperUserDB extends SQLiteOpenHelper {
         values.put(Email, user.getEmail());
         values.put(Pass, user.getPassword());
         long result = db.insert(TABLE_NAME, null, values);
+        db.close();
         return result != -1;
     }
 
@@ -52,6 +53,7 @@ public class HelperUserDB extends SQLiteOpenHelper {
         );
         boolean exists = cursor.getCount() > 0;
         cursor.close();
+        db.close();
         return exists;
     }
 
@@ -61,7 +63,16 @@ public class HelperUserDB extends SQLiteOpenHelper {
                 " WHERE " + Email + " = ?", new String[]{email});
         boolean exists = cursor.getCount() > 0;
         cursor.close();
+        db.close();
         return exists;
+    }
+    public boolean updatePassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Pass, newPassword);
+        int rowsAffected = db.update(TABLE_NAME, values, Email + " = ?", new String[]{email});
+        db.close();
+        return rowsAffected > 0;
     }
 
     @Override

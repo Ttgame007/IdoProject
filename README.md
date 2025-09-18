@@ -19,7 +19,7 @@ A mobile app designed to run lightweight and larger AI models locally efficientl
 
 - **RAM**: 8 GB
 - **CPU**: Snapdragon 8 Gen 1 / Dimensity 9200 / Exynos 2100
-- **Storage**: 10+ GB of free storage
+- **Storage**: 20+ GB of free storage
 
 > **Note:** There may be variability depending on the phone’s CPU and RAM. Your mileage may vary.  
 > This setup will run larger models (5-10B parameters) more efficiently and with faster token processing.

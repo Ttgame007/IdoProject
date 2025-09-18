@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "idoprojectapp"
 include(":app")
- 
+include(":llama")

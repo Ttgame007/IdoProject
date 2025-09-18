@@ -56,11 +56,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("data", "attempting to log in user");
 
         //check if user previusly loged in and saved infon into prefs
-        if (prefs.isLoggedIn()) {
-            Log.d("data", "loged in succesfully. found user " + usernameET.getText().toString() + " pre existing data. moving to AiActivity");
-            Intent intent = new Intent(this, AiActivity.class);
-            startActivity(intent);
-        }
+        prefsLogIn(prefs);
         Log.d("data", "attempting to log in user failed data not found or an error has occured");
 
         //go to sign up activity if user clicks he doesnt have an account
@@ -85,12 +81,8 @@ public class MainActivity extends AppCompatActivity {
             if (isSign) {
                 User user = new User(usernameET.getText().toString(), passET.getText().toString());
                 HelperUserDB hudb = new HelperUserDB(this);
-
                 if (hudb.checkUser(username, password)){
-                    prefs.saveCardensials(username, password);
-                    Log.d("data", "user" + username + " logged in");
-                    Intent intent = new Intent(this, AiActivity.class);
-                    startActivity(intent);
+                    logIn(prefs, username, password);
                 }
                 else {
                     usernameET.setError("Invalid username or password");
@@ -108,5 +100,18 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+    public void prefsLogIn(PrefsHelper prefs){
+        if (prefs.isLoggedIn()) {
+            Log.d("data", "loged in succesfully. found user " + usernameET.getText().toString() + " pre existing data. moving to AiActivity");
+            Intent intent = new Intent(this, AiActivity.class);
+            startActivity(intent);
+        }
+    }
+    public void logIn(PrefsHelper prefs, String username, String password) {
+        prefs.saveCardensials(username, password);
+        Log.d("data", "user" + username + " logged in");
+        Intent intent = new Intent(this, AiActivity.class);
+        startActivity(intent);
     }
 }
