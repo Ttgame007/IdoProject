@@ -6,10 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AiActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/RVmessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/inputOutline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
         <TextView
             android:id="@+id/welcomeText"
             android:layout_width="wrap_content"
@@ -35,15 +48,60 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/welcomeText" />
 
+
+
+
         <Button
-            android:id="@+id/logout"
-            android:layout_width="wrap_content"
+            android:id="@+id/inputOutline"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="logout"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
+            android:backgroundTint="@color/blue"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/ETinput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:ems="10"
+            android:inputType="text"
+            android:textStyle="bold"
+            android:textColor="@color/blue"
+            android:textColorHint="@color/blue"
+            android:background="@color/white"
+            android:hint="Ask anything"
+            app:layout_constraintBottom_toBottomOf="@id/inputOutline"
+            app:layout_constraintEnd_toEndOf="@id/inputOutline"
+            app:layout_constraintStart_toStartOf="@id/inputOutline"
+            app:layout_constraintTop_toTopOf="@id/inputOutline" />
+
+        <Button
+            android:id="@+id/BTNsend"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:backgroundTint="@color/lightBlue"
+            app:layout_constraintBottom_toBottomOf="@id/inputOutline"
+            app:layout_constraintEnd_toStartOf="@id/ETinput"
+            app:layout_constraintStart_toStartOf="@id/inputOutline"
+            app:layout_constraintTop_toTopOf="@id/inputOutline" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ai output sould show here"
+            android:textColor="@color/blue"
+            app:layout_constraintBottom_toTopOf="@+id/inputOutline"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/TVguest" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
