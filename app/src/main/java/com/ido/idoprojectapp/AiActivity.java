@@ -122,7 +122,7 @@ public class AiActivity extends AppCompatActivity {
         MenuItem profileItem = menu.findItem(R.id.profile);
         profileItem.setTitle(prefs.getUsername());
 
-        setupDrawer();
+        //setupDrawer();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
