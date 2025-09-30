@@ -55,6 +55,33 @@ public class JsonHelper {
             e.printStackTrace();
         }
     }
+    public static void removeChat(Context ctx, String username, int chatId) {
+        try {
+            // Get the user directory
+            File dir = new File(ctx.getFilesDir(), "user_" + username);
+            if (!dir.exists()) return;
+
+            List<Chat> chats = loadChats(ctx, username);
+
+            Chat chatToRemove = null;
+            for (Chat chat : chats) {
+                if (chat.getId() == chatId) {
+                    chatToRemove = chat;
+                    break;
+                }
+            }
+
+            if (chatToRemove != null) {
+                chats.remove(chatToRemove);
+                saveChats(ctx, username, chats);
+
+                // Delete the specific chat file
+                new File(dir, "chat_" + chatId + ".json").delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     // === Chat_X.json ===
     public static List<Massage> loadMessages(Context ctx, String username, int chatId) {
