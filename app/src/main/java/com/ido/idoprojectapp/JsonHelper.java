@@ -3,8 +3,6 @@ package com.ido.idoprojectapp;
 import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.ido.idoprojectapp.Chat;
-import com.ido.idoprojectapp.Massage;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -84,11 +82,11 @@ public class JsonHelper {
     }
 
     // === Chat_X.json ===
-    public static List<Massage> loadMessages(Context ctx, String username, int chatId) {
+    public static List<Message> loadMessages(Context ctx, String username, int chatId) {
         try {
             File file = new File(ctx.getFilesDir(), "user_" + username + "/chat_" + chatId + ".json");
             if (!file.exists()) return new ArrayList<>();
-            Type type = new TypeToken<List<Massage>>(){}.getType();
+            Type type = new TypeToken<List<Message>>(){}.getType();
             return gson.fromJson(readFile(file), type);
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,7 +94,7 @@ public class JsonHelper {
         }
     }
 
-    public static void saveMessages(Context ctx, String username, int chatId, List<Massage> messages) {
+    public static void saveMessages(Context ctx, String username, int chatId, List<Message> messages) {
         try {
             File dir = new File(ctx.getFilesDir(), "user_" + username);
             if (!dir.exists()) dir.mkdirs();

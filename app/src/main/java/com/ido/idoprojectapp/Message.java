@@ -1,9 +1,9 @@
 package com.ido.idoprojectapp;
 
-public class Massage {
+public class Message {
     private String content;
     private int sender; //1 for ai, 0 for user.
-    public Massage(String content, int sender) {
+    public Message(String content, int sender) {
         this.content = content;
         this.sender = sender;
     }

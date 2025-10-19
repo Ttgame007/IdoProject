@@ -29,16 +29,21 @@ public class AiActivity extends AppCompatActivity {
 
     private LLMW llmw;
     private Button BTNsend, newChatBtn;
-    private ImageButton logoutIcon;
-    private TextView TVoutput, profileName, TVguest;
+    private ImageButton logoutIcon, menuIcon;
+    private TextView WelcomeText, profileName, TVguest;
     private EditText ETinput;
     private DrawerLayout drawerLayout;
     private ConstraintLayout layout;
     private RecyclerView chatList;
-
+    private RecyclerView messageList;
+    private MessageAdapter messageAdapter;
     private List<Chat> chats = new ArrayList<>();
+    private List<Message> messages = new ArrayList<>();
+    private boolean isInChat;
     private ChatAdapter chatAdapter;
     private PrefsHelper prefs;
+    private String aiOutput;
+    private int currentChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,25 +53,36 @@ public class AiActivity extends AppCompatActivity {
         prefs = new PrefsHelper(this);
 
         // --- UI References ---
+        WelcomeText = findViewById(R.id.welcomeText);
         TVguest = findViewById(R.id.TVguest);
-        TVoutput = findViewById(R.id.textView);
         ETinput = findViewById(R.id.ETinput);
         BTNsend = findViewById(R.id.BTNsend);
         drawerLayout = findViewById(R.id.main);
         layout = findViewById(R.id.content);
         chatList = findViewById(R.id.chatList);
+        messageList = findViewById(R.id.messageList);
         newChatBtn = findViewById(R.id.newChatBtn);
+        menuIcon = findViewById(R.id.menuIcon);
         logoutIcon = findViewById(R.id.logoutIcon);
         profileName = findViewById(R.id.profileName);
-
         TVguest.setText(prefs.getUsername());
         profileName.setText(prefs.getUsername());
-        // Setup RecyclerView drawer
+        // Setup RecyclerViews
+        messageAdapter = new MessageAdapter(messages);
+        messageList.setAdapter(messageAdapter);
+        messageList.setLayoutManager(new LinearLayoutManager(AiActivity.this));
+
         chats = JsonHelper.loadChats(this, prefs.getUsername());
         chatAdapter = new ChatAdapter(chats, new ChatAdapter.OnChatClickListener() {
             @Override
             public void onChatClick(Chat chat) {
-                // TODO: load chat messages into RecyclerView in main content
+                currentChat = chat.getId();
+                WelcomeText.setVisibility(View.GONE);
+                TVguest.setVisibility(View.GONE);
+                isInChat = true;
+                messages.clear();
+                messages.addAll(JsonHelper.loadMessages(AiActivity.this, prefs.getUsername(), chat.getId()));
+                messageAdapter.notifyDataSetChanged();
                 drawerLayout.closeDrawer(GravityCompat.START);
             }
 
@@ -75,6 +91,15 @@ public class AiActivity extends AppCompatActivity {
                 showDeleteChatDialog(chat);
             }
         });
+
+        menuIcon.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
         chatList.setLayoutManager(new LinearLayoutManager(this));
         chatList.setAdapter(chatAdapter);
 
@@ -98,16 +123,46 @@ public class AiActivity extends AppCompatActivity {
 
         // Send button
         BTNsend.setOnClickListener(v -> {
-            String input = "user: " + ETinput.getText().toString() + "\n Assistant: ";
-            TVoutput.setText("");
+            if (!isInChat) {
+                WelcomeText.setVisibility(View.GONE);
+                TVguest.setVisibility(View.GONE);
+                isInChat = true;
+                //creates new chat loads it and sends the message there
+                Chat newChat = new Chat("Chat " + (chats.size() + 1), chats.size() + 1, null);
+                chats.add(newChat);
+                JsonHelper.saveChats(this, prefs.getUsername(), chats);
+                chatAdapter.notifyItemInserted(chats.size() - 1);
+                currentChat = newChat.getId();
+                messages.clear();
+                messages.add(new Message("", 1));
+                messageAdapter.notifyItemInserted(messages.size() - 1);
+            }
+            String userInput = ETinput.getText().toString();
+            if (userInput.isEmpty()) return;
+            String input = "user: " + userInput + "\n Assistant: ";
+            messages.add(new Message(userInput, 0));
+            messageAdapter.notifyItemInserted(messages.size() - 1);
+            messageList.scrollToPosition(messages.size() - 1);
 
+            ETinput.setText("");
+            ETinput.clearFocus();
+
+            int aiMessagePosition = messages.size() - 1;
+            messageAdapter.notifyItemInserted(messages.size() - 1);
+            messageList.scrollToPosition(messages.size() - 1);
+
+            // Send message to AI
             llmw.send(input, msg -> runOnUiThread(() -> {
-                TVoutput.append(msg);
+                Message aiMessage = messages.get(aiMessagePosition);
+                String currentContent = aiMessage.getContent();
+                aiMessage.setContent(currentContent + msg);
+                messageAdapter.notifyItemChanged(aiMessagePosition);
+                aiOutput = msg;
                 Log.d("input", input);
                 Log.d("output", msg);
-                ETinput.setText("");
-                ETinput.clearFocus();
+                JsonHelper.saveMessages(this, prefs.getUsername(), currentChat, messages);
             }));
+
         });
     }
     //i find this and below it really self explanatory
@@ -122,12 +177,14 @@ public class AiActivity extends AppCompatActivity {
                 .setTitle("Delete Chat")
                 .setMessage("Do you want to delete chat: " + chat.getName() + "?")
                 .setPositiveButton("Delete", (dialog, which) -> {
+                    int chatIdToDelete = chat.getId();
                     int index = chats.indexOf(chat);
                     if (index != -1) {
+                        JsonHelper.removeChat(this, prefs.getUsername(), chatIdToDelete);
                         chats.remove(index);
-                        JsonHelper.saveChats(this, prefs.getUsername(), chats);
                         chatAdapter.notifyItemRemoved(index);
                     }
+
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

@@ -13,7 +13,8 @@
         android:theme="@style/Theme.Idoprojectapp">
         <activity
             android:name=".AiActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".SignUp"
             android:exported="false" />
