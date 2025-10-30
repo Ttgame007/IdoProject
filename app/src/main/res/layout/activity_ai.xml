@@ -81,6 +81,7 @@
                 android:layout_marginStart="8dp"
                 android:backgroundTint="@color/blue"
                 android:text="Send"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/ETinput"
@@ -122,6 +123,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -135,7 +137,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp">
-
+            <Button
+                android:id="@+id/modelSettingsBtn"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="AI Models"
+                android:textColor="@android:color/white"
+                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
             <Button
                 android:id="@+id/newChatBtn"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -146,7 +158,8 @@
                 android:textAlignment="viewStart"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/modelSettingsBtn" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chatList"
@@ -168,9 +181,19 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@android:color/white" />
-
-            <TextView
-                android:id="@+id/profileName"
+            <ImageButton
+                android:id="@+id/settingIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_settings"
+                app:layout_constraintBottom_toBottomOf="@id/logoutIcon"
+                app:layout_constraintStart_toEndOf="@id/logoutIcon"
+                app:tint="@android:color/white" />
+            <Button
+                android:id="@+id/profileNameBtn"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -178,8 +201,9 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@id/logoutIcon"
-                app:layout_constraintStart_toEndOf="@id/logoutIcon"
+                app:layout_constraintStart_toEndOf="@id/settingIcon"
                 app:layout_constraintTop_toTopOf="@id/logoutIcon" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.navigation.NavigationView>

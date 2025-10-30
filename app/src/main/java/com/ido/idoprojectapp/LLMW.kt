@@ -1,29 +1,29 @@
 package com.ido.idoprojectapp
 
 import android.llama.cpp.LLamaAndroid
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
 class LLMW private constructor(
     private val llamaAndroid: LLamaAndroid = LLamaAndroid.instance()
 ) {
     interface MessageHandler {
         fun h(msg: String)
     }
-
     fun load(path: String) {
+        @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch {
             llamaAndroid.load(path)
         }
     }
-
     fun unload() {
+        @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch {
             llamaAndroid.unload()
         }
     }
-
     fun send(msg: String, mh: MessageHandler) {
+        @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch {
             llamaAndroid.send(msg).collect { mh.h(it) }
         }
@@ -31,11 +31,17 @@ class LLMW private constructor(
 
     companion object {
         @Volatile private var instance: LLMW? = null
-        private var isLoaded = false
 
+        @JvmStatic
+        var isLoaded = false
+            private set
         fun getInstance(modelPath: String? = null): LLMW {
             if (instance == null) {
-                instance = LLMW()
+                synchronized(this) {
+                    if (instance == null) {
+                        instance = LLMW()
+                    }
+                }
             }
             if (!isLoaded && modelPath != null) {
                 instance!!.load(modelPath)
@@ -45,9 +51,10 @@ class LLMW private constructor(
         }
 
         fun unloadModel() {
-            instance?.unload()
-            instance = null
-            isLoaded = false
+            if (isLoaded) {
+                instance?.unload()
+                isLoaded = false
+            }
         }
     }
 }

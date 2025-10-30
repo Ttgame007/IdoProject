@@ -1,5 +1,6 @@
 package com.ido.idoprojectapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,8 +9,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.app.AlertDialog;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
@@ -27,9 +29,10 @@ import java.util.List;
 
 public class AiActivity extends AppCompatActivity {
 
+    private static final int MODEL_SETTINGS_REQUEST_CODE = 1;
     private LLMW llmw;
-    private Button BTNsend, newChatBtn;
-    private ImageButton logoutIcon, menuIcon;
+    private Button BTNsend, newChatBtn, profileBtn, modelSettingsBtn;
+    private ImageButton logoutIcon, menuIcon, settingIcon;
     private TextView WelcomeText, profileName, TVguest;
     private EditText ETinput;
     private DrawerLayout drawerLayout;
@@ -57,6 +60,8 @@ public class AiActivity extends AppCompatActivity {
         TVguest = findViewById(R.id.TVguest);
         ETinput = findViewById(R.id.ETinput);
         BTNsend = findViewById(R.id.BTNsend);
+        profileBtn = findViewById(R.id.profileNameBtn);
+        modelSettingsBtn = findViewById(R.id.modelSettingsBtn);
         drawerLayout = findViewById(R.id.main);
         layout = findViewById(R.id.content);
         chatList = findViewById(R.id.chatList);
@@ -64,7 +69,8 @@ public class AiActivity extends AppCompatActivity {
         newChatBtn = findViewById(R.id.newChatBtn);
         menuIcon = findViewById(R.id.menuIcon);
         logoutIcon = findViewById(R.id.logoutIcon);
-        profileName = findViewById(R.id.profileName);
+        settingIcon = findViewById(R.id.settingIcon);
+        profileName = findViewById(R.id.profileNameBtn);
         TVguest.setText(prefs.getUsername());
         profileName.setText(prefs.getUsername());
         // Setup RecyclerViews
@@ -99,6 +105,10 @@ public class AiActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+        modelSettingsBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(AiActivity.this, ModelSettingsActivity.class);
+            startActivityForResult(intent, MODEL_SETTINGS_REQUEST_CODE);
+        });
 
         chatList.setLayoutManager(new LinearLayoutManager(this));
         chatList.setAdapter(chatAdapter);
@@ -113,16 +123,23 @@ public class AiActivity extends AppCompatActivity {
 
         // Logout listener attached to the icon
         logoutIcon.setOnClickListener(v -> logOut());
-
+        settingIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(AiActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
         // AI model setup
-        try {
-            llmw = LLMW.Companion.getInstance(preparePath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // THIS SECTION IS INTENTIONALLY LEFT BLANK.
+        // The model is now loaded only in ModelSettingsActivity to prevent delays here.
+        // onResume() will handle checking if the model is ready.
 
         // Send button
         BTNsend.setOnClickListener(v -> {
+            // Safety check in case the UI state is inconsistent
+            if (llmw == null || !LLMW.Companion.isLoaded()) {
+                Toast.makeText(this, "Cannot send: AI model is not active.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (!isInChat) {
                 WelcomeText.setVisibility(View.GONE);
                 TVguest.setVisibility(View.GONE);
@@ -134,12 +151,14 @@ public class AiActivity extends AppCompatActivity {
                 chatAdapter.notifyItemInserted(chats.size() - 1);
                 currentChat = newChat.getId();
                 messages.clear();
-                messages.add(new Message("", 1));
-                messageAdapter.notifyItemInserted(messages.size() - 1);
+                messageAdapter.notifyDataSetChanged();
             }
-            String userInput = ETinput.getText().toString();
+
+            String userInput = ETinput.getText().toString().trim();
             if (userInput.isEmpty()) return;
+
             String input = "user: " + userInput + "\n Assistant: ";
+            // Add the user's message
             messages.add(new Message(userInput, 0));
             messageAdapter.notifyItemInserted(messages.size() - 1);
             messageList.scrollToPosition(messages.size() - 1);
@@ -147,12 +166,15 @@ public class AiActivity extends AppCompatActivity {
             ETinput.setText("");
             ETinput.clearFocus();
 
-            int aiMessagePosition = messages.size() - 1;
-            messageAdapter.notifyItemInserted(messages.size() - 1);
-            messageList.scrollToPosition(messages.size() - 1);
+            // Add a blank placeholder for the AI's response
+            messages.add(new Message("", 1));
+            int aiMessagePosition = messages.size() - 1; // This is now the correct position
+            messageAdapter.notifyItemInserted(aiMessagePosition);
+            messageList.scrollToPosition(aiMessagePosition);
 
             // Send message to AI
             llmw.send(input, msg -> runOnUiThread(() -> {
+                // Get the message from the correct position and append new text
                 Message aiMessage = messages.get(aiMessagePosition);
                 String currentContent = aiMessage.getContent();
                 aiMessage.setContent(currentContent + msg);
@@ -160,9 +182,9 @@ public class AiActivity extends AppCompatActivity {
                 aiOutput = msg;
                 Log.d("input", input);
                 Log.d("output", msg);
+                // Save messages on each update to ensure no data loss
                 JsonHelper.saveMessages(this, prefs.getUsername(), currentChat, messages);
             }));
-
         });
     }
     //i find this and below it really self explanatory
@@ -184,24 +206,45 @@ public class AiActivity extends AppCompatActivity {
                         chats.remove(index);
                         chatAdapter.notifyItemRemoved(index);
                     }
-
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    //prepere the path for the ai model in the chach
-    private String preparePath() throws IOException {
-        InputStream inputStream = getResources().openRawResource(R.raw.llama);
-        File tempFile = File.createTempFile("myfile", ".gguf", getCacheDir());
-        try (OutputStream out = new FileOutputStream(tempFile)) {
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = inputStream.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MODEL_SETTINGS_REQUEST_CODE && resultCode == RESULT_OK) {
+            refreshModelState();
         }
-        inputStream.close();
-        return tempFile.getAbsolutePath();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshModelState();
+    }
+
+    private void setUiEnabled(boolean isEnabled) {
+        BTNsend.setEnabled(isEnabled);
+        ETinput.setEnabled(isEnabled);
+    }
+
+    private void refreshModelState() {
+        if (LLMW.Companion.isLoaded()) {
+            Log.d("AiActivity", "Model is loaded. Enabling UI.");
+            setUiEnabled(true);
+            ETinput.setHint("Type your message...");
+
+
+            if (llmw == null) {
+                llmw = LLMW.Companion.getInstance(null);
+            }
+        } else {
+            Log.d("AiActivity", "No model loaded. Disabling UI.");
+            setUiEnabled(false);
+            ETinput.setHint("Download a model in settings");
+            llmw = null;
+        }
     }
 }
