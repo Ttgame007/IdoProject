@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
 
-
 public class HelperUserDB extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "UsersDB.db";
     public static final String TABLE_NAME = "users";
@@ -84,11 +83,27 @@ public class HelperUserDB extends SQLiteOpenHelper {
         return exists;
     }
 
+    // ====== Account Modifications ======
+
     public boolean updatePassword(String email, String newPassword) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(Pass, newPassword);
         int rowsAffected = db.update(TABLE_NAME, values, Email + " = ?", new String[]{email});
+        return rowsAffected > 0;
+    }
+
+    public boolean updateUsername(String oldUsername, String newUsername) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Username, newUsername);
+        int rowsAffected = db.update(TABLE_NAME, values, Username + " = ?", new String[]{oldUsername});
+        return rowsAffected > 0;
+    }
+
+    public boolean deleteUser(String username) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rowsAffected = db.delete(TABLE_NAME, Username + " = ?", new String[]{username});
         return rowsAffected > 0;
     }
 

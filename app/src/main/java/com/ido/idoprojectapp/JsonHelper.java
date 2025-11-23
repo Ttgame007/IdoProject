@@ -30,6 +30,32 @@ public class JsonHelper {
         fw.close();
     }
 
+    // ====== Directory Management ======
+
+    public static boolean deleteUserDirectory(Context ctx, String username) {
+        File dir = new File(ctx.getFilesDir(), "user_" + username);
+        return deleteRecursive(dir);
+    }
+
+    private static boolean deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory()) {
+            for (File child : fileOrDirectory.listFiles()) {
+                deleteRecursive(child);
+            }
+        }
+        return fileOrDirectory.delete();
+    }
+
+    public static boolean renameUserDirectory(Context ctx, String oldUsername, String newUsername) {
+        File oldDir = new File(ctx.getFilesDir(), "user_" + oldUsername);
+        File newDir = new File(ctx.getFilesDir(), "user_" + newUsername);
+
+        if (oldDir.exists()) {
+            return oldDir.renameTo(newDir);
+        }
+        return false;
+    }
+
     // ====== Chat Operations ======
 
     public static List<Chat> loadChats(Context ctx, String username) {
