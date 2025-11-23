@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="@color/background_color"
     tools:context=".SettingsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp"
-        android:background="@android:color/white"
+        android:background="@color/surface_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -80,10 +80,11 @@
                 app:layout_constraintEnd_toEndOf="parent">
 
                 <ImageView
-                    android:id="@+id/notificationsIcon"
+                    android:id="@+id/ttsIcon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
+                    android:src="@android:drawable/ic_lock_silent_mode_off"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toTopOf="@id/divider1"
                     app:layout_constraintStart_toStartOf="parent"
@@ -92,17 +93,17 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Notifications"
+                    android:text="Text-to-Speech (TTS)"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/text_primary"
                     android:layout_marginStart="16dp"
-                    app:layout_constraintTop_toTopOf="@id/notificationsIcon"
-                    app:layout_constraintBottom_toBottomOf="@id/notificationsIcon"
-                    app:layout_constraintStart_toEndOf="@id/notificationsIcon"
-                    app:layout_constraintEnd_toStartOf="@id/notificationsSwitch"/>
+                    app:layout_constraintTop_toTopOf="@id/ttsIcon"
+                    app:layout_constraintBottom_toBottomOf="@id/ttsIcon"
+                    app:layout_constraintStart_toEndOf="@id/ttsIcon"
+                    app:layout_constraintEnd_toStartOf="@id/ttsSwitch"/>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/notificationsSwitch"
+                    android:id="@+id/ttsSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:layout_marginEnd="16dp"
@@ -114,9 +115,9 @@
                     android:id="@+id/divider1"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:background="#EEEEEE"
+                    android:background="@color/card_stroke"
                     android:layout_marginStart="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/notificationsSwitch"
+                    app:layout_constraintTop_toBottomOf="@id/ttsSwitch"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -135,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:text="Dark Mode"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/text_primary"
                     android:layout_marginStart="16dp"
                     app:layout_constraintTop_toTopOf="@id/darkModeIcon"
                     app:layout_constraintBottom_toBottomOf="@id/darkModeIcon"
@@ -152,7 +153,6 @@
                     app:layout_constraintEnd_toEndOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
 
             <TextView
                 android:id="@+id/accountTitle"
@@ -191,7 +191,7 @@
                     android:layout_height="wrap_content"
                     android:text="Profile"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/text_primary"
                     android:layout_marginStart="16dp"
                     android:paddingVertical="16dp"
                     app:layout_constraintTop_toTopOf="parent"

@@ -1,49 +1,65 @@
 package com.ido.idoprojectapp;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private SwitchMaterial darkModeSwitch;
-    private SharedPreferences sharedPreferences;
+    private SwitchMaterial darkModeSwitch, ttsSwitch;
+    private PrefsHelper prefs;
+
+    // ====== Lifecycle ======
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        sharedPreferences = getSharedPreferences("ThemePrefs", Context.MODE_PRIVATE);
+        prefs = new PrefsHelper(this);
 
+        initializeViews();
+        loadCurrentSettings();
+        setupListeners();
+    }
+
+    // ====== UI Setup ======
+
+    private void initializeViews() {
         ImageButton backButton = findViewById(R.id.backButton);
         darkModeSwitch = findViewById(R.id.darkModeSwitch);
+        ttsSwitch = findViewById(R.id.ttsSwitch);
 
-        boolean isNightMode = sharedPreferences.getBoolean("isNightMode", false);
-        darkModeSwitch.setChecked(isNightMode);
+        backButton.setOnClickListener(v -> finish());
+    }
 
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
+    private void loadCurrentSettings() {
+        darkModeSwitch.setChecked(prefs.isNightModeEnabled());
+        ttsSwitch.setChecked(prefs.isTtsEnabled());
+    }
+
+    // ====== Logic ======
+
+    private void setupListeners() {
+        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.setNightModeEnabled(isChecked);
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
         });
 
-        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                editor.putBoolean("isNightMode", true);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                editor.putBoolean("isNightMode", false);
+        ttsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.setTtsEnabled(isChecked);
+            if(isChecked){
+                Toast.makeText(this, "AI will now speak responses", Toast.LENGTH_SHORT).show();
             }
-            editor.apply();
         });
     }
 }

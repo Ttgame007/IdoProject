@@ -13,7 +13,8 @@ public class JsonHelper {
 
     private static final Gson gson = new Gson();
 
-    // Read text from file
+    // ====== File I/O ======
+
     private static String readFile(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         StringBuilder sb = new StringBuilder();
@@ -23,14 +24,14 @@ public class JsonHelper {
         return sb.toString();
     }
 
-    // Write text to file
     private static void writeFile(File file, String data) throws IOException {
         FileWriter fw = new FileWriter(file);
         fw.write(data);
         fw.close();
     }
 
-    // === Chats.json ===
+    // ====== Chat Operations ======
+
     public static List<Chat> loadChats(Context ctx, String username) {
         try {
             File file = new File(ctx.getFilesDir(), "user_" + username + "/chats.json");
@@ -53,9 +54,9 @@ public class JsonHelper {
             e.printStackTrace();
         }
     }
+
     public static void removeChat(Context ctx, String username, int chatId) {
         try {
-            // Get the user directory
             File dir = new File(ctx.getFilesDir(), "user_" + username);
             if (!dir.exists()) return;
 
@@ -72,8 +73,6 @@ public class JsonHelper {
             if (chatToRemove != null) {
                 chats.remove(chatToRemove);
                 saveChats(ctx, username, chats);
-
-                // Delete the specific chat file
                 new File(dir, "chat_" + chatId + ".json").delete();
             }
         } catch (Exception e) {
@@ -81,7 +80,8 @@ public class JsonHelper {
         }
     }
 
-    // === Chat_X.json ===
+    // ====== Message Operations ======
+
     public static List<Message> loadMessages(Context ctx, String username, int chatId) {
         try {
             File file = new File(ctx.getFilesDir(), "user_" + username + "/chat_" + chatId + ".json");

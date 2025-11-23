@@ -29,11 +29,9 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
         void onUseModelClick(Model model, int position);
     }
 
-
     public interface OnDeleteModelClickListener {
         void onDeleteModelClick(Model model, int position);
     }
-
 
     private final Context context;
     private final List<Model> models;
@@ -43,6 +41,29 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     private final OnDeleteModelClickListener deleteListener;
     private Map<String, Integer> downloadProgressMap;
     private String currentModelFilename;
+
+    @Override
+    public void onBindViewHolder(@NonNull ModelViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty()) {
+            // If we have a payload, it means we only want to update the progress bar
+            Model model = models.get(position);
+            Integer progress = (downloadProgressMap != null) ? downloadProgressMap.get(model.getFilename()) : null;
+
+            if (progress != null) {
+                holder.downloadButton.setVisibility(View.GONE);
+                holder.cancelButton.setVisibility(View.VISIBLE);
+                holder.downloadProgressLayout.setVisibility(View.VISIBLE);
+                holder.downloadProgressBar.setProgress(progress);
+                holder.downloadProgressText.setText(progress + "%");
+            } else {
+                // If progress became null (finished/cancelled), do a full rebind
+                super.onBindViewHolder(holder, position, payloads);
+            }
+        } else {
+            // No payload, do full bind
+            super.onBindViewHolder(holder, position, payloads);
+        }
+    }
 
     public ModelAdapter(Context context, List<Model> models, String currentModelFilename,
                         OnDownloadClickListener downloadListener,
@@ -65,6 +86,8 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     public void setCurrentModelFilename(String newFilename) {
         this.currentModelFilename = newFilename;
     }
+
+    // ====== View Binding ======
 
     @NonNull
     @Override
@@ -158,4 +181,6 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
             cancelButton.setOnClickListener(v -> cancelListener.onCancelClick(model, getAdapterPosition()));
         }
     }
+
+
 }

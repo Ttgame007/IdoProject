@@ -12,12 +12,13 @@ import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.massageViewHolder> {
 
-
     private List<Message> messages;
+
     public MessageAdapter(List<Message> messages) {
         this.messages = messages;
     }
 
+    // ====== View Binding ======
 
     @NonNull
     @Override
@@ -38,12 +39,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.massageV
         }
     }
 
-
-
     @Override
     public int getItemCount() {
         return messages.size();
     }
+
     static class massageViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         massageViewHolder(View itemView) {

@@ -4,16 +4,27 @@ public class User {
     private String username;
     private String password;
     private String email;
+    private byte[] profilePicture;
+
 
     public User(String username,  String email, String password) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.profilePicture = null;
     }
     public User(String username,  String password) {
         this.username = username;
         this.password = password;
     }
+
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
 
     public String getUsername() {
         return username;

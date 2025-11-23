@@ -33,14 +33,12 @@ public class DownloadService extends Service {
 
     private static final String TAG = "DownloadService";
 
-    // Actions
     public static final String ACTION_DOWNLOAD = "com.ido.idoprojectapp.action.DOWNLOAD";
     public static final String ACTION_CANCEL_DOWNLOAD = "com.ido.idoprojectapp.action.CANCEL";
     public static final String ACTION_PROGRESS = "com.ido.idoprojectapp.broadcast.PROGRESS";
     public static final String ACTION_COMPLETE = "com.ido.idoprojectapp.broadcast.COMPLETE";
     public static final String ACTION_FAILED = "com.ido.idoprojectapp.broadcast.FAILED";
 
-    // Extras
     public static final String EXTRA_MODEL = "com.ido.idoprojectapp.extra.MODEL";
     public static final String EXTRA_FILENAME = "com.ido.idoprojectapp.extra.FILENAME";
     public static final String EXTRA_PROGRESS = "com.ido.idoprojectapp.extra.PROGRESS";
@@ -48,7 +46,6 @@ public class DownloadService extends Service {
     private static final String CHANNEL_ID = "DownloadChannel";
     private static final int NOTIFICATION_ID = 1;
 
-    // Static State Holders
     private static final Map<String, Integer> ongoingDownloads = Collections.synchronizedMap(new HashMap<>());
     private static final Map<String, Call> activeCalls = Collections.synchronizedMap(new HashMap<>());
 
@@ -59,6 +56,8 @@ public class DownloadService extends Service {
     private OkHttpClient okHttpClient;
     private PowerManager.WakeLock wakeLock;
     private NotificationManager notificationManager;
+
+    // ====== Lifecycle ======
 
     @Override
     public void onCreate() {
@@ -100,19 +99,26 @@ public class DownloadService extends Service {
         return START_NOT_STICKY;
     }
 
-    private void cancelDownload(String filename) {
-        Call call = activeCalls.get(filename);
-        if (call != null) {
-            call.cancel();
+    @Override
+    public void onDestroy() {
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
         }
-        // Also clean up here in case the onFailure doesn't trigger immediately
-        cleanupAndBroadcastFailure(filename);
+        super.onDestroy();
     }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    // ====== Download Logic ======
 
     private void downloadModel(final Model model) {
         wakeLock.acquire();
         ongoingDownloads.put(model.getFilename(), 0);
-        broadcastProgress(model.getFilename(), 0); // Inform UI that download has started
+        broadcastProgress(model.getFilename(), 0);
 
         File destinationFile = new File(getFilesDir(), model.getFilename());
         Request request = new Request.Builder().url(model.getPath()).build();
@@ -147,9 +153,8 @@ public class DownloadService extends Service {
 
                         while ((count = input.read(data)) != -1) {
                             if (call.isCanceled()) {
-                                // Important: Check for cancellation inside the loop
-                                destinationFile.delete(); // Clean up partial file
-                                return; // Exit the loop
+                                destinationFile.delete();
+                                return;
                             }
                             total += count;
                             output.write(data, 0, count);
@@ -176,6 +181,14 @@ public class DownloadService extends Service {
         });
     }
 
+    private void cancelDownload(String filename) {
+        Call call = activeCalls.get(filename);
+        if (call != null) {
+            call.cancel();
+        }
+        cleanupAndBroadcastFailure(filename);
+    }
+
     private void cleanupAndBroadcastFailure(String filename) {
         ongoingDownloads.remove(filename);
         activeCalls.remove(filename);
@@ -192,13 +205,7 @@ public class DownloadService extends Service {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        if (wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-        super.onDestroy();
-    }
+    // ====== Broadcast & Notification ======
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -221,8 +228,8 @@ public class DownloadService extends Service {
     private void broadcastProgress(String filename, int progress) {
         ongoingDownloads.put(filename, progress);
         Intent intent = new Intent(ACTION_PROGRESS);
+        intent.setPackage(getPackageName());
         intent.putExtra(EXTRA_FILENAME, filename);
-        // --- FIX: Pass the progress directly in the intent ---
         intent.putExtra(EXTRA_PROGRESS, progress);
         sendBroadcast(intent);
     }
@@ -230,6 +237,7 @@ public class DownloadService extends Service {
     private void broadcastComplete(String filename) {
         ongoingDownloads.remove(filename);
         Intent intent = new Intent(ACTION_COMPLETE);
+        intent.setPackage(getPackageName());
         intent.putExtra(EXTRA_FILENAME, filename);
         sendBroadcast(intent);
     }
@@ -237,13 +245,8 @@ public class DownloadService extends Service {
     private void broadcastFailure(String filename) {
         ongoingDownloads.remove(filename);
         Intent intent = new Intent(ACTION_FAILED);
+        intent.setPackage(getPackageName());
         intent.putExtra(EXTRA_FILENAME, filename);
         sendBroadcast(intent);
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }

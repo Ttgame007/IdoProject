@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,14 +28,17 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout layout;
     EditText usernameET, passET;
 
+    // ====== Lifecycle ======
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
 
         PrefsHelper prefs = new PrefsHelper(this);
+        getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
 
         isSign = false;
 
@@ -49,35 +53,36 @@ public class MainActivity extends AppCompatActivity {
         layout.setVisibility(View.INVISIBLE);
         SignInForeground.setVisibility(View.INVISIBLE);
 
-        //ui too probelmatic if i bhave time fix this later this line is to force protrait couse horizontal is messing up the views
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.d("data", "screen is forced to prtrait");
 
         Log.d("data", "attempting to log in user");
 
-        //check if user previusly loged in and saved infon into prefs
         prefsLogIn(prefs);
         Log.d("data", "attempting to log in user failed data not found or an error has occured");
 
-        //go to sign up activity if user clicks he doesnt have an account
         signUp.setOnClickListener(v -> {
             Log.d("data", "attempting to go to sign up activity");
             Intent intent = new Intent(this, SignUp.class);
             startActivity(intent);
         });
 
-        //rediracts to the thwakz website
+        Button forgotBtn = findViewById(R.id.forgotText);
+        forgotBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
+
         thwakz.setOnClickListener(v -> {
             Log.d("data", "attempting to go to thwakz website");
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org")));
         });
 
-
         signIn.setOnClickListener(v -> {
 
             String username = usernameET.getText().toString().trim();
             String password = passET.getText().toString().trim();
-            //if user presses the sign in for the first time it opens the field after that will attepmpting to log in the user and checking cardentials
+
             if (isSign) {
                 User user = new User(usernameET.getText().toString(), passET.getText().toString());
                 HelperUserDB hudb = new HelperUserDB(this);
@@ -101,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    // ====== Auth Logic ======
+
     public void prefsLogIn(PrefsHelper prefs){
         if (prefs.isLoggedIn()) {
             Log.d("data", "loged in succesfully. found user " + usernameET.getText().toString() + " pre existing data. moving to AiActivity");
@@ -108,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
+
     public void logIn(PrefsHelper prefs, String username, String password) {
         prefs.saveCardensials(username, password);
         Log.d("data", "user" + username + " logged in");

@@ -5,7 +5,6 @@ public class Chat {
     private int id;
     private Model model;
 
-    //for later this is the way chats are gonna be saved and opened via drawer
     public Chat(String name, int id, Model model) {
         this.name = name;
         this.id = id;

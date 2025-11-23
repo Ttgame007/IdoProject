@@ -7,10 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".AiActivity">
 
+    <!-- Main content -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/background_color">
 
         <TextView
             android:id="@+id/welcomeText"
@@ -38,16 +40,15 @@
             app:layout_constraintTop_toBottomOf="@id/welcomeText"
             tools:text="Guest" />
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messageList"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"    app:layout_constraintBottom_toTopOf="@+id/inputContainer"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/inputContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/nevbar" />
-
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/inputContainer"
@@ -69,63 +70,85 @@
                 android:padding="12dp"
                 android:background="@drawable/input_outline"
                 android:imeOptions="flagNoFullscreen"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/BTNsend"
+                app:layout_constraintEnd_toStartOf="@+id/BTNmic"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/BTNmic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Voice Input"
+                android:scaleType="centerInside"
+                android:src="@android:drawable/ic_btn_speak_now"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/BTNsend"
+                app:layout_constraintStart_toEndOf="@+id/ETinput"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/blue" />
 
             <Button
                 android:id="@+id/BTNsend"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:backgroundTint="@color/blue"
                 android:text="Send"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/ETinput"
+                app:layout_constraintStart_toEndOf="@id/BTNmic"
                 app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/nevbar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:background="@color/surface_color"
+            android:elevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
             <TextView
                 android:id="@+id/navbarTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ThwazkAI"
+                android:text="ThwakzAI"
                 android:textColor="@color/blue"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/menuIcon"
+                android:paddingVertical="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/menuIcon" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/menuIcon"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Open Menu"
                 android:src="@drawable/ic_menu"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/blue" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="match_parent"
@@ -137,6 +160,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="16dp">
+
             <Button
                 android:id="@+id/modelSettingsBtn"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -148,6 +172,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
             <Button
                 android:id="@+id/newChatBtn"
                 style="@style/Widget.AppCompat.Button.Borderless"
@@ -160,50 +185,91 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/modelSettingsBtn" />
 
-
+            <!-- This RecyclerView uses item_chat.xml so text is white -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/chatList"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/logoutIcon"
+                app:layout_constraintTop_toBottomOf="@id/newChatBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/userInfoContainer" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/userInfoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/newChatBtn" />
-
-            <ImageButton
-                android:id="@+id/logoutIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_logout"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@android:color/white" />
-            <ImageButton
-                android:id="@+id/settingIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_settings"
-                app:layout_constraintBottom_toBottomOf="@id/logoutIcon"
-                app:layout_constraintStart_toEndOf="@id/logoutIcon"
-                app:tint="@android:color/white" />
-            <Button
-                android:id="@+id/profileNameBtn"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Profile Name"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@id/logoutIcon"
-                app:layout_constraintStart_toEndOf="@id/settingIcon"
-                app:layout_constraintTop_toTopOf="@id/logoutIcon" />
+                android:padding="10dp"
+                android:background="@android:color/transparent">
 
+                <ImageButton
+                    android:id="@+id/logoutIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_logout"
+                    android:padding="8dp"
+                    app:tint="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageButton
+                    android:id="@+id/settingIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_settings"
+                    android:padding="8dp"
+                    app:tint="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/logoutIcon"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/profileNameBtn"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Profile Name"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/profileCard"
+                    app:layout_constraintStart_toEndOf="@id/settingIcon"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/profileCard"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/drawerProfileImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_default_avatar"
+                        app:shapeAppearanceOverlay="@style/CircleImageStyle" />
+
+                </androidx.cardview.widget.CardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.navigation.NavigationView>

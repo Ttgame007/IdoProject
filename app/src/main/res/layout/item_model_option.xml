@@ -6,7 +6,8 @@
     android:layout_marginVertical="6dp"
     app:cardElevation="2dp"
     app:strokeWidth="1dp"
-    app:strokeColor="#DDDDDD">
+    app:strokeColor="@color/card_stroke"
+    app:cardBackgroundColor="@color/surface_color">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,6 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Model description goes here."
+            android:textColor="@color/text_primary"
             android:textSize="14sp" />
 
         <RelativeLayout
@@ -91,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:progress="0"
                     app:indicatorColor="@color/blue"
-                    app:trackColor="#DFDFDF"
+                    app:trackColor="@color/card_stroke"
                     app:trackCornerRadius="8dp" />
 
                 <TextView
@@ -101,6 +103,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="2dp"
                     android:text="0%"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 

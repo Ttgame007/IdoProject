@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,20 +28,21 @@ public class SignUp extends AppCompatActivity {
 
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
-                    "(?=.*[0-9])" +         //at least 1 digit
-                    "(?=.*[a-z])" +         //at least 1 lower case letter
-                    "(?=.*[A-Z])" +         //at least 1 upper case letter
-                    "(?=.*[@#$%^&+=])" +    //at least 1 special character
-                    "(?=\\S+$)" +           //no white spaces
-                    ".{8,}" +               //at least 8 characters
+                    "(?=.*[0-9])" +
+                    "(?=.*[a-z])" +
+                    "(?=.*[A-Z])" +
+                    "(?=.*[@#$%^&+=])" +
+                    "(?=\\S+$)" +
+                    ".{8,}" +
                     "$");
+
+    // ====== Lifecycle ======
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sign_up);
-
         hudb = new HelperUserDB(this);
 
         thwakz = findViewById(R.id.thwakzLogo);
@@ -50,8 +52,8 @@ public class SignUp extends AppCompatActivity {
         rePassET = findViewById(R.id.rePassET);
         signUp = findViewById(R.id.signUp);
 
-        //ui too probelmatic if i bhave time fix this later this line is to force protrait couse horizontal is messing up the views
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
 
         thwakz.setOnClickListener(v -> {
@@ -68,6 +70,8 @@ public class SignUp extends AppCompatActivity {
             return insets;
         });
     }
+
+    // ====== Validation ======
 
     private boolean validateEmail() {
         String emailInput = emailET.getText().toString().trim();
@@ -124,8 +128,10 @@ public class SignUp extends AppCompatActivity {
             String username = usernameET.getText().toString();
             String password = passET.getText().toString();
             String email = emailET.getText().toString();
+            byte[] defaultAvatar = HelperUserDB.convertDrawableToByteArray(this, R.drawable.ic_default_avatar);
             PrefsHelper prefs = new PrefsHelper(this);
             User user = new User(username, email , password);
+            user.setProfilePicture(defaultAvatar);
             hudb.insertUser(user);
             prefs.saveCardensials(username, password);
             finish();
