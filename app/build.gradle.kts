@@ -39,6 +39,7 @@ android {
 dependencies {
     implementation("androidx.activity:activity:1.8.0")
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.google.firebase:firebase-analytics")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
     implementation("androidx.activity:activity-ktx:1.6.1")

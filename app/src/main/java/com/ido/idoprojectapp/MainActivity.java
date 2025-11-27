@@ -1,5 +1,7 @@
 package com.ido.idoprojectapp;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -7,16 +9,21 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.view.animation.DecelerateInterpolator;
+import androidx.core.splashscreen.SplashScreen;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -29,17 +36,27 @@ public class MainActivity extends AppCompatActivity {
     Button signIn, signUp;
     ImageButton thwakz;
     ImageView SignInForeground;
+
+    ConstraintLayout mainContent;
+    View splashBackground;
+    ImageView waterDrop;
+
     Boolean isSign;
     LinearLayout layout;
-
 
     TextInputEditText usernameET, passET;
     TextInputLayout usrInputLayout, passInputLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         PrefsHelper prefs = new PrefsHelper(this);
+        if (prefs.isLoggedIn()) {
+            startActivity(new Intent(this, AiActivity.class));
+            finish();
+            return;
+        }
         getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -50,7 +67,9 @@ public class MainActivity extends AppCompatActivity {
         prefsLogIn(prefs);
         setupListeners();
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        startWaterDropAnimation();
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainContent), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -58,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        mainContent = findViewById(R.id.mainContent);
+        splashBackground = findViewById(R.id.splashBackground);
+        waterDrop = findViewById(R.id.waterDrop);
+
         SignInForeground = findViewById(R.id.signInForeground);
         layout = findViewById(R.id.layout);
         signUp = findViewById(R.id.signUpText);
@@ -74,6 +97,70 @@ public class MainActivity extends AppCompatActivity {
         SignInForeground.setVisibility(View.INVISIBLE);
     }
 
+
+    private void startWaterDropAnimation() {
+        waterDrop.post(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            waterDrop.setVisibility(View.VISIBLE);
+            waterDrop.setTranslationY(-1000f);
+            waterDrop.setAlpha(0f);
+            waterDrop.setScaleX(0.5f);
+            waterDrop.setScaleY(0.5f);
+
+            waterDrop.animate()
+                    .translationY(0f)
+                    .alpha(1f)
+                    .setDuration(800)
+                    .setInterpolator(new BounceInterpolator())
+                    .withEndAction(this::startRippleReveal)
+                    .start();
+        });
+    }
+
+    private void startRippleReveal() {
+        if (isFinishing() || isDestroyed() || mainContent == null || !ViewCompat.isAttachedToWindow(mainContent)) {
+            return;
+        }
+
+        int cx = mainContent.getWidth() / 2;
+        int cy = mainContent.getHeight() / 2;
+
+        if (cx == 0 || cy == 0) {
+            mainContent.setVisibility(View.VISIBLE);
+            splashBackground.setVisibility(View.GONE);
+            waterDrop.setVisibility(View.GONE);
+            return;
+        }
+
+        float finalRadius = (float) Math.hypot(cx, cy);
+
+        try {
+            Animator anim = ViewAnimationUtils.createCircularReveal(mainContent, cx, cy, 0f, finalRadius);
+            anim.setDuration(600);
+            anim.setInterpolator(new AccelerateInterpolator());
+
+            mainContent.setVisibility(View.VISIBLE);
+            waterDrop.animate().alpha(0f).setDuration(200).start();
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    if (!isFinishing()) {
+                        splashBackground.setVisibility(View.GONE);
+                        waterDrop.setVisibility(View.GONE);
+                    }
+                }
+            });
+
+            anim.start();
+
+        } catch (Exception e) {
+            mainContent.setVisibility(View.VISIBLE);
+            splashBackground.setVisibility(View.GONE);
+            waterDrop.setVisibility(View.GONE);
+        }
+    }
+
     private void setupListeners() {
         setupErrorClearer(usernameET, usrInputLayout);
         setupErrorClearer(passET, passInputLayout);
@@ -83,62 +170,51 @@ public class MainActivity extends AppCompatActivity {
         thwakz.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org"))));
 
         signIn.setOnClickListener(v -> {
-                    String username = usernameET.getText().toString().trim();
-                    String password = passET.getText().toString().trim();
+            String username = usernameET.getText().toString().trim();
+            String password = passET.getText().toString().trim();
 
-                    if (isSign) {
-                        HelperUserDB hudb = new HelperUserDB(this);
-                        if (hudb.checkUser(username, password)) {
-                            logIn(new PrefsHelper(this), username, password);
-                        } else {
-                            UIHelper.showError(this, passInputLayout, "Invalid username or password");
-                            UIHelper.showError(this, usrInputLayout, "Invalid username or password");
-                        }
-
-                    } else {
-                        isSign = true;
-
-                        layout.setVisibility(View.VISIBLE);
-                        SignInForeground.setVisibility(View.VISIBLE);
-
-                        // 2. Determine how far to push them down.
-                        // Using the foreground's height ensures they start exactly off the bottom edge.
-                        float distanceToMove = SignInForeground.getHeight();
-
-                        // Safety check: if height is 0 (rare, but possible if layout isn't ready), use a safe default
-                        if (distanceToMove == 0) distanceToMove = 1000f;
-
-                        // 3. Set the initial position (Pushed down by the same amount)
-                        // By moving both by 'distanceToMove', their relative positions stay locked.
-                        SignInForeground.setTranslationY(distanceToMove);
-                        layout.setTranslationY(distanceToMove);
-
-                        // Optional: Start transparent
-                        SignInForeground.setAlpha(0f);
-                        layout.setAlpha(0f);
-
-                        // 4. Animate both to 0 (Original Position) with identical settings
-                        // NO START DELAY provided to either, so they move in perfect lockstep.
-
-                        long duration = 500; // Same duration for both
-                        DecelerateInterpolator interpolator = new DecelerateInterpolator(); // Same interpolator
-
-                        SignInForeground.animate()
-                                .translationY(0f)
-                                .alpha(1f)
-                                .setDuration(duration)
-                                .setInterpolator(interpolator)
-                                .start();
-
-                        layout.animate()
-                                .translationY(0f)
-                                .alpha(1f)
-                                .setDuration(duration)
-                                .setInterpolator(interpolator)
-                                .start();
-                    }
+            if (isSign) {
+                HelperUserDB hudb = new HelperUserDB(this);
+                if (hudb.checkUser(username, password)){
+                    logIn(new PrefsHelper(this), username, password);
+                } else {
+                    UIHelper.showError(this, passInputLayout, "Invalid username or password");
+                    UIHelper.showError(this, usrInputLayout, "Invalid username or password");
                 }
-        );
+
+            } else {
+                isSign = true;
+
+                layout.setVisibility(View.VISIBLE);
+                SignInForeground.setVisibility(View.VISIBLE);
+
+                float distanceToMove = SignInForeground.getHeight();
+                if (distanceToMove == 0) distanceToMove = 1000f; // Fallback
+
+                SignInForeground.setTranslationY(distanceToMove);
+                layout.setTranslationY(distanceToMove);
+
+                SignInForeground.setAlpha(0f);
+                layout.setAlpha(0f);
+
+                long duration = 500;
+                DecelerateInterpolator interpolator = new DecelerateInterpolator();
+
+                SignInForeground.animate()
+                        .translationY(0f)
+                        .alpha(1f)
+                        .setDuration(duration)
+                        .setInterpolator(interpolator)
+                        .start();
+
+                layout.animate()
+                        .translationY(0f)
+                        .alpha(1f)
+                        .setDuration(duration)
+                        .setInterpolator(interpolator)
+                        .start();
+            }
+        });
     }
 
     private void setupErrorClearer(EditText et, TextInputLayout til) {

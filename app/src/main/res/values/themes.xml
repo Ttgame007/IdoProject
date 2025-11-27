@@ -30,9 +30,7 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <!-- Modern Input Style -->
     <style name="ModernInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <!-- ... keep existing corner items ... -->
         <item name="boxCornerRadiusTopStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
         <item name="boxCornerRadiusBottomStart">12dp</item>
@@ -41,7 +39,6 @@
         <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">2dp</item>
 
-        <!-- FIX: Use the reference @color/error_red -->
         <item name="errorIconDrawable">@drawable/ic_error_alert</item>
         <item name="errorIconTint">@color/error_red</item>
 
@@ -54,5 +51,11 @@
         <item name="android:textColor">@android:color/transparent</item>
         <item name="android:letterSpacing">0</item>
     </style>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/blue</item>
 
+        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.Idoprojectapp</item>
+    </style>
 </resources>
