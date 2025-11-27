@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:screenOrientation="portrait"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue"
+    android:screenOrientation="portrait"
     tools:context=".SignUp">
 
     <TextView
@@ -15,10 +15,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:textSize="60dp"
-        android:textStyle="bold"
-        android:textColor="@color/white"
         android:text="Create an account"
+        android:textColor="@color/white"
+        android:textSize="40sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,140 +28,148 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:backgroundTint="@color/blue"
         app:srcCompat="@drawable/thwakz" />
+
     <Button
         android:id="@+id/signUp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="50dp"
         android:backgroundTint="@color/white"
         android:text="Sign Up"
         android:textColor="@color/blue"
-        android:textSize="30dp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
-        android:layout_width="409dp"
-        android:layout_height="522dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        app:layout_constraintBottom_toTopOf="@id/signUp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/signUp"
         app:layout_constraintTop_toBottomOf="@id/createTV"
-        tools:layout_editor_absoluteX="1dp"
+        app:layout_constraintVertical_bias="0.2">
 
-        tools:layout_editor_absoluteY="251dp">
         <TextView
-            android:id="@+id/usrTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:textSize="20dp"
-            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:text="Username"
             android:textColor="@color/white"
-            android:layout_weight="0"
-            android:text="Username" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/usrInputLayout"
+            style="@style/ModernInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:hintEnabled="false">
 
-        <EditText
-            android:id="@+id/usrET"
-            android:layout_width="363dp"
-            android:layout_weight="0"
-            android:layout_height="58dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="@color/white"
-            android:backgroundTint="@color/white"
-            android:ems="10"
-            android:hint="Username"
-            android:inputType="text"
-            android:textColor="@color/blue" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/usrET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Username"
+                android:inputType="text"
+                android:padding="16dp"
+                android:textColor="@color/blue" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <TextView
-            android:id="@+id/emailTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:textSize="20dp"
-            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:text="E-Mail"
             android:textColor="@color/white"
-            android:layout_weight="0"
-            android:text="E-Mail" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/emailInputLayout"
+            style="@style/ModernInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:hintEnabled="false">
 
-        <EditText
-            android:id="@+id/emailET"
-            android:layout_width="363dp"
-            android:layout_weight="0"
-            android:layout_height="58dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="@color/white"
-            android:backgroundTint="@color/white"
-            android:ems="10"
-            android:hint="E-Mail"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/blue" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="E-Mail"
+                android:inputType="textEmailAddress"
+                android:padding="16dp"
+                android:textColor="@color/blue" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <TextView
-            android:id="@+id/passTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:textSize="20dp"
-            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:text="Password"
             android:textColor="@color/white"
-            android:layout_weight="0"
-            android:text="Password" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passInputLayout"
+            style="@style/ModernInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/blue"
+            app:hintEnabled="false">
 
-        <EditText
-            android:id="@+id/passET"
-            android:layout_width="363dp"
-            android:layout_weight="0"
-            android:layout_height="58dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="@color/white"
-            android:backgroundTint="@color/white"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:textColor="@color/blue" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:textColor="@color/blue" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <TextView
-            android:id="@+id/rePassTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:textSize="20dp"
-            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:text="Repeat password"
             android:textColor="@color/white"
-            android:layout_weight="0"
-            android:text="Repeat password" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/rePassInputLayout"
+            style="@style/ModernInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:endIconMode="password_toggle"
+            app:endIconTint="@color/blue"
+            app:hintEnabled="false">
 
-        <EditText
-            android:id="@+id/rePassET"
-            android:layout_width="363dp"
-            android:layout_weight="0"
-            android:layout_height="58dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:background="@color/white"
-            android:backgroundTint="@color/white"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:textColor="@color/blue" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/rePassET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Repeat Password"
+                android:inputType="textPassword"
+                android:padding="16dp"
+                android:textColor="@color/blue" />
+        </com.google.android.material.textfield.TextInputLayout>
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

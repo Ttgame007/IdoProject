@@ -17,8 +17,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.app.AlertDialog;
+import android.animation.ObjectAnimator;
+import android.animation.AnimatorSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,18 +47,12 @@ public class AiActivity extends AppCompatActivity {
     private TextToSpeech textToSpeech;
     private boolean isTtsReady = false;
 
+    private android.animation.AnimatorSet thinkingAnimator;
     private static final int REQUEST_VOICE_INPUT = 11;
     private static final int MODEL_SETTINGS_REQUEST_CODE = 1;
     private static final int REQUEST_PICK_IMAGE = 2;
     private static final int REQUEST_CAPTURE_IMAGE = 3;
     private static final int REQUEST_CAMERA_PERMISSION = 10;
-
-    private static final String SYSTEM_PROMPT =
-            "You are a helpful AI assistant. " +
-                    "Provide direct, accurate, and concise answers. " +
-                    "Do not continue the conversation yourself. " +
-                    "Do not generate user questions or responses. " +
-                    "Stop your response when you have fully answered the question.";
 
     private static final List<String> STOP_TOKENS = Arrays.asList(
             "\nuser:", "\nUser:", "\nUSER:",
@@ -137,6 +132,27 @@ public class AiActivity extends AppCompatActivity {
         super.onResume();
         refreshModelState();
         loadProfileImageFromDb();
+
+
+        if (chats != null && chatAdapter != null) {
+            chats.clear();
+            List<Chat> loadedChats = JsonHelper.loadChats(this, prefs.getUsername());
+            if (loadedChats != null) {
+                chats.addAll(loadedChats);
+            }
+            chatAdapter.notifyDataSetChanged();
+
+            if (chats.isEmpty()) {
+                messages.clear();
+                if (messageAdapter != null) {
+                    messageAdapter.notifyDataSetChanged();
+                }
+                isInChat = false;
+                if (WelcomeText != null) WelcomeText.setVisibility(View.VISIBLE);
+                if (TVguest != null) TVguest.setVisibility(View.VISIBLE);
+                currentChat = -1;
+            }
+        }
     }
 
     @Override
@@ -180,7 +196,7 @@ public class AiActivity extends AppCompatActivity {
                     imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                    UIHelper.showError(this, drawerProfileImage,"Failed to load image");
                 }
             }
         } else if (requestCode == REQUEST_CAPTURE_IMAGE) {
@@ -196,9 +212,9 @@ public class AiActivity extends AppCompatActivity {
 
             if (isUpdated) {
                 loadProfileImageFromDb();
-                Toast.makeText(this, "Profile picture updated!", Toast.LENGTH_SHORT).show();
+                UIHelper.showInfo(this, "Profile picture updated!");
             } else {
-                Toast.makeText(this, "Failed to update profile picture", Toast.LENGTH_SHORT).show();
+                UIHelper.showError(this, drawerProfileImage, "Failed to update profile picture");
             }
         }
     }
@@ -211,7 +227,7 @@ public class AiActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             } else {
-                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
+                UIHelper.showError(this, drawerProfileImage, "Camera permission denied");
             }
         }
     }
@@ -336,7 +352,7 @@ public class AiActivity extends AppCompatActivity {
 
     private void sendMessage() {
         if (llmw == null || !LLMW.Companion.isLoaded()) {
-            Toast.makeText(this, "AI model is not loaded", Toast.LENGTH_SHORT).show();
+            UIHelper.showError(this,BTNsend, "No model loaded");
             return;
         }
 
@@ -373,6 +389,8 @@ public class AiActivity extends AppCompatActivity {
         messageList.scrollToPosition(aiMessagePosition);
 
         int maxTokens = prefs.getMaxResponseTokens();
+        toggleThinkingAnimation(true);
+
         sendToModel(prompt, aiMessagePosition, maxTokens);
     }
 
@@ -380,8 +398,11 @@ public class AiActivity extends AppCompatActivity {
         StringBuilder prompt = new StringBuilder();
         int maxContextMessages = prefs.getMaxContextMessages();
 
+        // --- UPDATED: Uses the combined prompt (Rules + User Persona) ---
+        String currentSystemPrompt = prefs.getEffectiveSystemPrompt();
+
         prompt.append("### System\n");
-        prompt.append(SYSTEM_PROMPT).append("\n\n");
+        prompt.append(currentSystemPrompt).append("\n\n");
 
         if (!messages.isEmpty()) {
             prompt.append("### Previous Conversation\n");
@@ -412,12 +433,21 @@ public class AiActivity extends AppCompatActivity {
         final boolean[] stopped = {false};
         final int[] tokenCount = {0};
 
+        float temp = prefs.getTemperature();
+        int topK = prefs.getTopK();
+        float topP = prefs.getTopP();
+        float repeatPenalty = prefs.getRepeatPenalty();
+
         llmw.send(prompt, msg -> {
             runOnUiThread(() -> {
                 try {
                     if (stopped[0]) return;
 
                     tokenCount[0]++;
+
+                    if (tokenCount[0] == 1) {
+                        toggleThinkingAnimation(false);
+                    }
 
                     if (tokenCount[0] > maxTokens) {
                         stopped[0] = true;
@@ -466,7 +496,7 @@ public class AiActivity extends AppCompatActivity {
                     Log.e("AiActivity", "Error processing token", e);
                 }
             });
-        });
+        },temp, topK, topP, repeatPenalty);
 
         messageList.postDelayed(() -> {
             JsonHelper.saveMessages(this, prefs.getUsername(), currentChat, messages);
@@ -501,7 +531,6 @@ public class AiActivity extends AppCompatActivity {
                     LLMW.Companion.getInstance(modelFile.getAbsolutePath(), prefs.getContextSize());
                     runOnUiThread(() -> {
                         refreshModelState();
-                        Toast.makeText(AiActivity.this, "Model Loaded", Toast.LENGTH_SHORT).show();
                     });
 
                 } catch (Exception e) {
@@ -518,6 +547,7 @@ public class AiActivity extends AppCompatActivity {
                         prefs.setCurrentModel(null);
                         runOnUiThread(() -> {
                             refreshModelState();
+                            UIHelper.showInfo(AiActivity.this, "Model Loaded");
                             new AlertDialog.Builder(AiActivity.this)
                                     .setTitle("Model Corrupted")
                                     .setMessage("The model file was incomplete or corrupted. It has been deleted. Please go to Settings and download it again.")
@@ -581,10 +611,13 @@ public class AiActivity extends AppCompatActivity {
     }
 
     private void showDeleteChatDialog(Chat chat) {
-        new AlertDialog.Builder(this)
-                .setTitle("Delete Chat")
-                .setMessage("Delete \"" + chat.getName() + "\"?")
-                .setPositiveButton("Delete", (dialog, which) -> {
+        CustomDialogHelper.showConfirmation(
+                this,
+                "Delete Chat",
+                "Are you sure you want to delete \"" + chat.getName() + "\"? This cannot be undone.",
+                "Delete",
+                "Cancel",
+                () -> {
                     int chatIdToDelete = chat.getId();
                     int index = chats.indexOf(chat);
                     if (index != -1) {
@@ -599,9 +632,8 @@ public class AiActivity extends AppCompatActivity {
                             TVguest.setVisibility(View.VISIBLE);
                         }
                     }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                }
+        );
     }
 
     private void showDebugOptions() {
@@ -613,10 +645,12 @@ public class AiActivity extends AppCompatActivity {
                 "Reset AI settings"
         };
 
-        new AlertDialog.Builder(this)
-                .setTitle("Debug Options")
-                .setItems(options, (dialog, which) -> {
-                    switch (which) {
+        CustomDialogHelper.showOptionsDialog(
+                this,
+                "Debug Options",
+                options,
+                (index) -> {
+                    switch (index) {
                         case 0:
                             ETinput.setText("What is 15 + 27?");
                             BTNsend.performClick();
@@ -629,18 +663,16 @@ public class AiActivity extends AppCompatActivity {
                             messages.clear();
                             messageAdapter.notifyDataSetChanged();
                             messageCount = 0;
-                            Toast.makeText(this, "Conversation cleared", Toast.LENGTH_SHORT).show();
                             break;
                         case 3:
                             showTokenStats();
                             break;
                         case 4:
                             prefs.resetToDefaults();
-                            Toast.makeText(this, "AI settings reset to defaults", Toast.LENGTH_SHORT).show();
                             break;
                     }
-                })
-                .show();
+                }
+        );
     }
 
     private void showTokenStats() {
@@ -667,11 +699,7 @@ public class AiActivity extends AppCompatActivity {
                 prefs.getMaxContextMessages()
         );
 
-        new AlertDialog.Builder(this)
-                .setTitle("Token Statistics")
-                .setMessage(stats)
-                .setPositiveButton("OK", null)
-                .show();
+        CustomDialogHelper.showInfo(this, "Token Statistics", stats, "OK");
     }
 
     // ====== Multimedia & TTS ======
@@ -685,7 +713,7 @@ public class AiActivity extends AppCompatActivity {
         try {
             startActivityForResult(intent, REQUEST_VOICE_INPUT);
         } catch (Exception e) {
-            Toast.makeText(this, "Voice input not supported on this device", Toast.LENGTH_SHORT).show();
+            UIHelper.showError(this, BTNmic, "Voice input not supported on this device");
         }
     }
 
@@ -703,10 +731,12 @@ public class AiActivity extends AppCompatActivity {
 
     private void showImageSourceDialog() {
         String[] options = {"Camera", "Gallery"};
-        new AlertDialog.Builder(this)
-                .setTitle("Choose Profile Picture")
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
+        CustomDialogHelper.showOptionsDialog(
+                this,
+                "Choose Profile Picture",
+                options,
+                (index) -> {
+                    if (index == 0) {
                         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                                 != PackageManager.PERMISSION_GRANTED) {
                             ActivityCompat.requestPermissions(this,
@@ -718,8 +748,8 @@ public class AiActivity extends AppCompatActivity {
                     } else {
                         openGallery();
                     }
-                })
-                .show();
+                }
+        );
     }
 
     private void openGallery() {
@@ -775,54 +805,71 @@ public class AiActivity extends AppCompatActivity {
     // ====== Settings & Navigation ======
 
     private void showCustomSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
 
         EditText maxTokensEdit = new EditText(this);
         maxTokensEdit.setHint("Max response tokens (current: " + prefs.getMaxResponseTokens() + ")");
         maxTokensEdit.setText(String.valueOf(prefs.getMaxResponseTokens()));
         maxTokensEdit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        maxTokensEdit.setBackgroundResource(R.drawable.input_outline);
+        maxTokensEdit.setPadding(30, 30, 30, 30);
 
         EditText contextEdit = new EditText(this);
         contextEdit.setHint("Context messages (current: " + prefs.getMaxContextMessages() + ")");
         contextEdit.setText(String.valueOf(prefs.getMaxContextMessages()));
         contextEdit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        contextEdit.setBackgroundResource(R.drawable.input_outline);
+        contextEdit.setPadding(30, 30, 30, 30);
 
         EditText tempEdit = new EditText(this);
         tempEdit.setHint("Temperature 0.1-1.0 (current: " + prefs.getTemperature() + ")");
         tempEdit.setText(String.valueOf(prefs.getTemperature()));
         tempEdit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(50, 40, 50, 10);
+        tempEdit.setBackgroundResource(R.drawable.input_outline);
+        tempEdit.setPadding(30, 30, 30, 30);
 
         TextView label1 = new TextView(this);
         label1.setText("Max Response Tokens (50-1024):");
         label1.setTextSize(14);
+        label1.setTextColor(getColor(R.color.text_primary));
+        label1.setPadding(0, 20, 0, 10);
+
         layout.addView(label1);
         layout.addView(maxTokensEdit);
 
         TextView label2 = new TextView(this);
         label2.setText("\nContext Messages to Include (0-20):");
         label2.setTextSize(14);
+        label2.setTextColor(getColor(R.color.text_primary));
+        label2.setPadding(0, 20, 0, 10);
+
         layout.addView(label2);
         layout.addView(contextEdit);
 
         TextView label3 = new TextView(this);
         label3.setText("\nTemperature (0.1=focused, 1.0=creative):");
         label3.setTextSize(14);
+        label3.setTextColor(getColor(R.color.text_primary));
+        label3.setPadding(0, 20, 0, 10);
+
         layout.addView(label3);
         layout.addView(tempEdit);
 
         TextView infoText = new TextView(this);
         infoText.setText("\nNote: Lower temperature = more consistent\nHigher temperature = more creative");
         infoText.setTextSize(12);
-        infoText.setTextColor(0xFF888888);
+        infoText.setTextColor(getColor(R.color.text_secondary));
         layout.addView(infoText);
 
-        builder.setView(layout)
-                .setTitle("Custom AI Settings")
-                .setPositiveButton("Save", (dialog, which) -> {
+        CustomDialogHelper.showCustomView(
+                this,
+                "Custom AI Settings",
+                layout,
+                "Save",
+                "Defaults",
+                () -> {
+                    // Positive (Save) Action
                     try {
                         int maxTokens = Integer.parseInt(maxTokensEdit.getText().toString());
                         int contextMsgs = Integer.parseInt(contextEdit.getText().toString());
@@ -838,50 +885,41 @@ public class AiActivity extends AppCompatActivity {
                         prefs.setMaxResponseTokens(maxTokens);
                         prefs.setMaxContextMessages(contextMsgs);
                         prefs.setTemperature(temperature);
-
-                        Toast.makeText(this,
-                                "Settings saved:\nTokens: " + maxTokens +
-                                        "\nContext: " + contextMsgs +
-                                        "\nTemp: " + String.format("%.1f", temperature),
-                                Toast.LENGTH_LONG).show();
+                        UIHelper.showInfo(this, "Settings Saved");
                     } catch (NumberFormatException e) {
-                        Toast.makeText(this, "Invalid values entered", Toast.LENGTH_SHORT).show();
+                        UIHelper.showError(this, "Invalid numbers entered");
                     }
-                })
-                .setNeutralButton("Defaults", (dialog, which) -> {
+                },
+                () -> {
                     prefs.resetToDefaults();
-                    Toast.makeText(this, "Reset to default settings", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+                    UIHelper.showInfo(this, "Reset to defaults");
+                }
+        );
     }
-
     private void showAIConfigDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
         String[] modes = {"Fast Mode", "Balanced Mode", "Quality Mode", "Custom Settings"};
 
-        builder.setTitle("AI Configuration")
-                .setItems(modes, (dialog, which) -> {
-                    switch (which) {
+        CustomDialogHelper.showOptionsDialog(
+                this,
+                "AI Configuration",
+                modes,
+                (index) -> {
+                    switch (index) {
                         case 0:
                             prefs.applyFastMode();
-                            Toast.makeText(this, "Fast mode applied - Quick responses, less context", Toast.LENGTH_SHORT).show();
                             break;
                         case 1:
                             prefs.applyBalancedMode();
-                            Toast.makeText(this, "Balanced mode applied - Good performance and quality", Toast.LENGTH_SHORT).show();
                             break;
                         case 2:
                             prefs.applyQualityMode();
-                            Toast.makeText(this, "Quality mode applied - Best responses, more context", Toast.LENGTH_SHORT).show();
                             break;
                         case 3:
                             showCustomSettingsDialog();
                             break;
                     }
-                })
-                .show();
+                }
+        );
     }
 
     private void logOut() {
@@ -895,5 +933,42 @@ public class AiActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+    // ====== Animations ======
 
+    private void toggleThinkingAnimation(boolean isThinking) {
+        if (isThinking) {
+            if (thinkingAnimator != null && thinkingAnimator.isRunning()) {
+                return;
+            }
+
+            android.animation.ObjectAnimator scaleX = android.animation.ObjectAnimator.ofFloat(ETinput, "scaleX", 1f, 0.9f);
+            android.animation.ObjectAnimator scaleY = android.animation.ObjectAnimator.ofFloat(ETinput, "scaleY", 1f, 0.9f);
+
+            android.animation.ObjectAnimator alpha = android.animation.ObjectAnimator.ofFloat(ETinput, "alpha", 1f, 0.5f);
+
+            scaleX.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+            scaleX.setRepeatMode(android.animation.ObjectAnimator.REVERSE);
+
+            scaleY.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+            scaleY.setRepeatMode(android.animation.ObjectAnimator.REVERSE);
+
+            alpha.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+            alpha.setRepeatMode(android.animation.ObjectAnimator.REVERSE);
+
+            thinkingAnimator = new android.animation.AnimatorSet();
+            thinkingAnimator.playTogether(scaleX, scaleY, alpha);
+            thinkingAnimator.setDuration(800);
+            thinkingAnimator.start();
+
+        } else {
+            if (thinkingAnimator != null) {
+                thinkingAnimator.cancel();
+                thinkingAnimator = null;
+            }
+
+            ETinput.setScaleX(1f);
+            ETinput.setScaleY(1f);
+            ETinput.setAlpha(1f);
+        }
+    }
 }

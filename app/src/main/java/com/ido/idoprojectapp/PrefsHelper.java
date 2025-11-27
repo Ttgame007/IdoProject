@@ -29,6 +29,23 @@ public class PrefsHelper {
     private static final String KEY_DARK_MODE = "dark_mode";
     private static final String KEY_TTS_ENABLED = "tts_enabled";
 
+
+    private static final String KEY_USER_PERSONA = "user_persona_description";
+
+
+    private static final String KEY_USER_SYSTEM_PROMPT = "user_defined_system_prompt";
+
+
+    private static final String BASE_CONSTRAINTS =
+            "SYSTEM FORMATTING RULES:\n" +
+                    "1. ADOPT THE PERSONA defined by the user in the 'ASSISTANT PERSONA' section below. If told to be a specific character, animal, or object, you must STAY IN CHARACTER.\n" +
+                    "2. DO NOT generate the User's response. You must STOP writing immediately after you have finished your turn.\n" +
+                    "3. DO NOT generate lines starting with 'User:', 'Human:', or '###'.\n" +
+                    "4. The user's specific instructions below override any default behavior.";
+
+    private static final String DEFAULT_USER_PROMPT =
+            "You are a helpful and intelligent assistant.";
+
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
 
@@ -120,6 +137,49 @@ public class PrefsHelper {
     }
 
     // ====== Generation Parameters ======
+
+
+    public String getUserSystemPrompt() {
+        return sharedPreferences.getString(KEY_USER_SYSTEM_PROMPT, DEFAULT_USER_PROMPT);
+    }
+
+
+    public void setUserSystemPrompt(String prompt) {
+        editor.putString(KEY_USER_SYSTEM_PROMPT, prompt);
+        editor.apply();
+    }
+
+
+    public String getUserPersona() {
+        return sharedPreferences.getString(KEY_USER_PERSONA, ""); // Default is blank
+    }
+
+    public void setUserPersona(String persona) {
+        editor.putString(KEY_USER_PERSONA, persona);
+        editor.apply();
+    }
+
+
+    public String getEffectiveSystemPrompt() {
+        String aiPersona = getUserSystemPrompt();
+        String userDescription = getUserPersona();
+        String username = getUsername();
+
+        StringBuilder finalPrompt = new StringBuilder();
+
+        finalPrompt.append(BASE_CONSTRAINTS).append("\n\n");
+
+        finalPrompt.append("### ASSISTANT PERSONA\n").append(aiPersona).append("\n\n");
+
+        finalPrompt.append("### USER INFO\n");
+        finalPrompt.append("User's Name: ").append(username).append("\n");
+        if (!userDescription.isEmpty()) {
+            finalPrompt.append("User Context: ").append(userDescription).append("\n");
+        }
+
+        return finalPrompt.toString();
+    }
+
 
     public float getTemperature() {
         return sharedPreferences.getFloat(KEY_TEMPERATURE, 0.7f);
@@ -254,6 +314,7 @@ public class PrefsHelper {
         applyBalancedMode();
         editor.putInt(KEY_CONTEXT_SIZE, 2048);
         editor.putBoolean(KEY_USE_SMART_CONTEXT, true);
+        editor.remove(KEY_USER_SYSTEM_PROMPT); // Reset to default user prompt
         editor.apply();
     }
 }

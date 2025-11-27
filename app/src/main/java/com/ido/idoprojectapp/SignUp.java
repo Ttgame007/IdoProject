@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,27 +18,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.regex.Pattern;
 
 public class SignUp extends AppCompatActivity {
 
     ImageButton thwakz;
-    EditText usernameET, emailET, passET, rePassET;
+    TextInputEditText usernameET, emailET, passET, rePassET;
+    TextInputLayout usrInputLayout, emailInputLayout, passInputLayout, rePassInputLayout;
     Button signUp;
-
     HelperUserDB hudb;
 
-    private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^" +
-                    "(?=.*[0-9])" +
-                    "(?=.*[a-z])" +
-                    "(?=.*[A-Z])" +
-                    "(?=.*[@#$%^&+=])" +
-                    "(?=\\S+$)" +
-                    ".{8,}" +
-                    "$");
-
-    // ====== Lifecycle ======
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^" +
+            "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,24 +41,10 @@ public class SignUp extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
         hudb = new HelperUserDB(this);
 
-        thwakz = findViewById(R.id.thwakzLogo);
-        usernameET = findViewById(R.id.usrET);
-        emailET = findViewById(R.id.emailET);
-        passET = findViewById(R.id.passET);
-        rePassET = findViewById(R.id.rePassET);
-        signUp = findViewById(R.id.signUp);
-
+        initializeViews();
+        setupListeners();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
-
-        thwakz.setOnClickListener(v -> {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org")));
-        });
-
-        signUp.setOnClickListener(v -> {
-            validateFields();
-        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -71,72 +53,107 @@ public class SignUp extends AppCompatActivity {
         });
     }
 
-    // ====== Validation ======
+    private void initializeViews() {
+        thwakz = findViewById(R.id.thwakzLogo);
+        signUp = findViewById(R.id.signUp);
+
+        usernameET = findViewById(R.id.usrET);
+        usrInputLayout = findViewById(R.id.usrInputLayout);
+
+        emailET = findViewById(R.id.emailET);
+        emailInputLayout = findViewById(R.id.emailInputLayout);
+
+        passET = findViewById(R.id.passET);
+        passInputLayout = findViewById(R.id.passInputLayout);
+
+        rePassET = findViewById(R.id.rePassET);
+        rePassInputLayout = findViewById(R.id.rePassInputLayout);
+    }
+
+    private void setupListeners() {
+        setupErrorClearer(usernameET, usrInputLayout);
+        setupErrorClearer(emailET, emailInputLayout);
+        setupErrorClearer(passET, passInputLayout);
+        setupErrorClearer(rePassET, rePassInputLayout);
+
+        thwakz.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org"))));
+        signUp.setOnClickListener(v -> validateFields());
+    }
+
+    private void setupErrorClearer(EditText et, TextInputLayout til) {
+        et.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (til != null) {
+                    til.setError(null);
+                    til.setErrorEnabled(false);
+                }
+            }
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+    private boolean validateUsername(){
+        String usernameInput = usernameET.getText().toString().trim();
+        if (usernameInput.isEmpty()) {
+            UIHelper.showError(this, usrInputLayout, "Field can't be empty");
+            return false;
+        }
+        return true;
+    }
 
     private boolean validateEmail() {
         String emailInput = emailET.getText().toString().trim();
-
         if (emailInput.isEmpty()) {
-            emailET.setError("Field can't be empty");
-            return false;
+            UIHelper.showError(this, emailInputLayout, "Field can't be empty");            return false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) {
-            emailET.setError("Please enter a valid email address");
+            UIHelper.showError(this, emailInputLayout, "Invalid email address");
             return false;
-        }         else if (hudb.checkEmail(emailInput)) {
-            emailET.setError("Email already exists");
+        } else if (hudb.checkEmail(emailInput)) {
+            UIHelper.showError(this, emailInputLayout, "Email already exists");
             return false;
-        } else {
-            emailET.setError(null);
-            return true;
         }
-
+        return true;
     }
 
     private boolean validatePassword() {
         String passwordInput = passET.getText().toString().trim();
-
         if (passwordInput.isEmpty()) {
-            passET.setError("Field can't be empty");
+            UIHelper.showError(this, passInputLayout, "Field can't be empty");
             return false;
         } else if (!PASSWORD_PATTERN.matcher(passwordInput).matches()) {
-            passET.setError("Password too weak. It must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character.");
+            UIHelper.showError(this, passInputLayout, "Weak Password: 8+ chars, Upper, Lower, Digit, Special");
             return false;
-        } else {
-            passET.setError(null);
-            return true;
         }
+        return true;
     }
 
     private boolean validateRepeatPassword() {
         String passwordInput = passET.getText().toString().trim();
         String repeatPasswordInput = rePassET.getText().toString().trim();
-
         if (repeatPasswordInput.isEmpty()) {
-            rePassET.setError("Field can't be empty");
+            UIHelper.showError(this, rePassInputLayout, "Field can't be empty");
             return false;
         } else if (!passwordInput.equals(repeatPasswordInput)) {
-            rePassET.setError("Passwords do not match");
+            UIHelper.showError(this, rePassInputLayout,"Passwords do not match");
             return false;
-        } else {
-            rePassET.setError(null);
-            return true;
         }
+        return true;
     }
 
     private void validateFields() {
-        if (validateEmail() && validatePassword() && validateRepeatPassword()) {
+        if (validateUsername() && validateEmail() && validatePassword() && validateRepeatPassword()) {
             String username = usernameET.getText().toString();
             String password = passET.getText().toString();
             String email = emailET.getText().toString();
             byte[] defaultAvatar = HelperUserDB.convertDrawableToByteArray(this, R.drawable.ic_default_avatar);
-            PrefsHelper prefs = new PrefsHelper(this);
-            User user = new User(username, email , password);
+
+            User user = new User(username, email, password);
             user.setProfilePicture(defaultAvatar);
             hudb.insertUser(user);
-            prefs.saveCardensials(username, password);
+            new PrefsHelper(this).saveCardensials(username, password);
+
             finish();
-            Intent intent = new Intent(this, AiActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, AiActivity.class));
         }
     }
 }

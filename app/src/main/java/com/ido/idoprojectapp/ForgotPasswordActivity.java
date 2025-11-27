@@ -2,10 +2,11 @@ package com.ido.idoprojectapp;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,40 +15,34 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.util.regex.Pattern;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
-    private EditText etEmail, etNewPass, etConfirmPass;
+    private TextInputEditText etEmail, etNewPass, etConfirmPass;
+    private TextInputLayout emailInputLayout, newPassInputLayout, confirmPassInputLayout;
     private Button btnReset;
     private HelperUserDB userDb;
 
-    private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^" +
-                    "(?=.*[0-9])" +         // at least 1 digit
-                    "(?=.*[a-z])" +         // at least 1 lower case letter
-                    "(?=.*[A-Z])" +         // at least 1 upper case letter
-                    "(?=.*[@#$%^&+=])" +    // at least 1 special character
-                    "(?=\\S+$)" +           // no white spaces
-                    ".{8,}" +               // at least 8 characters
-                    "$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^" +
+            "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
 
-    // ====== Lifecycle ======
+    // ===== Lifecycle ======
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_forgot_password);
-
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
         userDb = new HelperUserDB(this);
 
         initViews();
-
-        btnReset.setOnClickListener(v -> attemptReset());
+        setupListeners();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -56,16 +51,41 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         });
     }
 
-    // ====== UI Setup ======
+    // ===== UI Setup ======
 
     private void initViews() {
         etEmail = findViewById(R.id.etResetEmail);
+        emailInputLayout = findViewById(R.id.emailInputLayout);
+
         etNewPass = findViewById(R.id.etNewPassword);
+        newPassInputLayout = findViewById(R.id.newPassInputLayout);
+
         etConfirmPass = findViewById(R.id.etConfirmNewPassword);
+        confirmPassInputLayout = findViewById(R.id.confirmPassInputLayout);
+
         btnReset = findViewById(R.id.btnResetPassword);
     }
 
-    // ====== Logic ======
+    private void setupListeners() {
+        setupErrorClearer(etEmail, emailInputLayout);
+        setupErrorClearer(etNewPass, newPassInputLayout);
+        setupErrorClearer(etConfirmPass, confirmPassInputLayout);
+        btnReset.setOnClickListener(v -> attemptReset());
+    }
+
+    private void setupErrorClearer(EditText et, TextInputLayout til) {
+        et.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (til != null) {
+                    UIHelper.clearError(til);
+                }
+            }
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    // ===== Logic ======
 
     private void attemptReset() {
         String email = etEmail.getText().toString().trim();
@@ -73,40 +93,36 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         String confirmPass = etConfirmPass.getText().toString().trim();
 
         if (email.isEmpty()) {
-            etEmail.setError("Field can't be empty");
+            UIHelper.showError(this, emailInputLayout, "Field can't be empty");
             return;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Please enter a valid email address");
+            UIHelper.showError(this, emailInputLayout, "Invalid email address");
             return;
         }
-
         if (!userDb.checkEmail(email)) {
-            etEmail.setError("This email is not registered");
+            UIHelper.showError(this, emailInputLayout, "Email not found");
             return;
         }
 
         if (pass.isEmpty()) {
-            etNewPass.setError("Field can't be empty");
+            UIHelper.showError(this, newPassInputLayout, "Field can't be empty");
             return;
         }
         if (!PASSWORD_PATTERN.matcher(pass).matches()) {
-            etNewPass.setError("Password too weak. Must contain 8+ chars, 1 Upper, 1 Lower, 1 Digit, 1 Special.");
+            UIHelper.showError(this, newPassInputLayout, "Weak Password: 8+ chars, Upper, Lower, Digit, Special");
             return;
         }
-
         if (!pass.equals(confirmPass)) {
-            etConfirmPass.setError("Passwords do not match");
+            UIHelper.showError(this, confirmPassInputLayout, "Passwords do not match");
             return;
         }
 
-        boolean success = userDb.updatePassword(email, pass);
-
-        if (success) {
-            Toast.makeText(this, "Password updated successfully!", Toast.LENGTH_SHORT).show();
+        if (userDb.updatePassword(email, pass)) {
+            UIHelper.showInfo(this, "Password updated succesfully");
             finish();
         } else {
-            Toast.makeText(this, "Error updating password.", Toast.LENGTH_SHORT).show();
+            UIHelper.showError(this, null, "Error updating password");
         }
     }
 }

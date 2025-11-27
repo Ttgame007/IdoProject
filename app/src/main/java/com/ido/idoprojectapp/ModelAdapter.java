@@ -45,7 +45,6 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
     @Override
     public void onBindViewHolder(@NonNull ModelViewHolder holder, int position, @NonNull List<Object> payloads) {
         if (!payloads.isEmpty()) {
-            // If we have a payload, it means we only want to update the progress bar
             Model model = models.get(position);
             Integer progress = (downloadProgressMap != null) ? downloadProgressMap.get(model.getFilename()) : null;
 
@@ -56,11 +55,9 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
                 holder.downloadProgressBar.setProgress(progress);
                 holder.downloadProgressText.setText(progress + "%");
             } else {
-                // If progress became null (finished/cancelled), do a full rebind
                 super.onBindViewHolder(holder, position, payloads);
             }
         } else {
-            // No payload, do full bind
             super.onBindViewHolder(holder, position, payloads);
         }
     }
@@ -140,12 +137,14 @@ public class ModelAdapter extends RecyclerView.Adapter<ModelAdapter.ModelViewHol
 
             itemView.setOnLongClickListener(v -> {
                 if (fileExists) {
-                    new AlertDialog.Builder(context)
-                            .setTitle("Delete Model")
-                            .setMessage("Are you sure you want to delete the downloaded file for '" + model.getName() + "'?")
-                            .setPositiveButton("Delete", (dialog, which) -> deleteListener.onDeleteModelClick(model, getAdapterPosition()))
-                            .setNegativeButton("Cancel", null)
-                            .show();
+                    CustomDialogHelper.showConfirmation(
+                            context,
+                            "Delete Model",
+                            "Are you sure you want to delete the downloaded file for '" + model.getName() + "'?",
+                            "Delete",
+                            "Cancel",
+                            () -> deleteListener.onDeleteModelClick(model, getAdapterPosition())
+                    );
                     return true;
                 }
                 return false;

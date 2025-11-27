@@ -93,6 +93,15 @@ public class HelperUserDB extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
+    // New method for Settings Activity
+    public boolean updatePasswordByUsername(String username, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Pass, newPassword);
+        int rowsAffected = db.update(TABLE_NAME, values, Username + " = ?", new String[]{username});
+        return rowsAffected > 0;
+    }
+
     public boolean updateUsername(String oldUsername, String newUsername) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();

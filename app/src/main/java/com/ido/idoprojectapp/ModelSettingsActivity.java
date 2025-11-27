@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,7 +46,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (!isGranted) {
-                    Toast.makeText(this, "Notification permission is needed for download progress.", Toast.LENGTH_LONG).show();
+                    UIHelper.showInfo(this,"Notification permission is needed for download progress.");
                 }
             });
 
@@ -125,7 +124,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
         } catch (Exception e) {
             Log.e(TAG, "Error loading model list.", e);
-            Toast.makeText(this, "Error: Could not load model list.", Toast.LENGTH_LONG).show();
+            UIHelper.showError(this, "Error: Could not load model list.");
         } finally {
             listProgressBar.setVisibility(View.GONE);
             modelsRecyclerView.setVisibility(View.VISIBLE);
@@ -146,7 +145,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
     // ====== Model Logic ======
 
     private void loadModel(Model model, int position) {
-        Toast.makeText(this, "Loading " + model.getName() + "...", Toast.LENGTH_SHORT).show();
+        UIHelper.showInfo(this, "Loading " + model.getName() + "...");
 
         View itemView = modelsRecyclerView.getLayoutManager().findViewByPosition(position);
         if (itemView != null) {
@@ -163,7 +162,6 @@ public class ModelSettingsActivity extends AppCompatActivity {
 
                 runOnUiThread(() -> {
                     prefs.setCurrentModel(model);
-                    Toast.makeText(this, model.getName() + " loaded with " + contextSize + " token context!", Toast.LENGTH_LONG).show();
                     setResult(RESULT_OK);
                     updateCurrentModelStatus();
                     adapter.setCurrentModelFilename(prefs.getCurrentModelFilename());
@@ -173,7 +171,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load model into LLMW.", e);
                 runOnUiThread(() -> {
-                    Toast.makeText(this, "ERROR: Failed to load " + model.getName(), Toast.LENGTH_LONG).show();
+                    UIHelper.showError(this, "ERROR: Failed to load " + model.getName());
                     if (itemView != null) {
                         itemView.findViewById(R.id.downloadButton).setEnabled(true);
                     }
@@ -208,8 +206,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
     private void deleteModel(Model model, int position) {
         File file = new File(getFilesDir(), model.getFilename());
         if (file.exists() && file.delete()) {
-            Toast.makeText(this, "Deleted " + model.getName(), Toast.LENGTH_SHORT).show();
-
+            UIHelper.showInfo(this, "Deleted " + model.getName());
             if (model.getFilename().equals(prefs.getCurrentModelFilename())) {
                 LLMW.Companion.unloadModel();
                 prefs.clearCurrentModel();
@@ -218,7 +215,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
             }
             adapter.notifyItemChanged(position);
         } else {
-            Toast.makeText(this, "Could not delete file.", Toast.LENGTH_SHORT).show();
+            UIHelper.showError(this, "Could not delete file.");
         }
     }
 
@@ -228,7 +225,7 @@ public class ModelSettingsActivity extends AppCompatActivity {
         long requiredBytes = parseSizeToBytes(model.getSize());
         long availableBytes = getAvailableInternalMemorySize();
         if (availableBytes < requiredBytes) {
-            Toast.makeText(this, "Not enough storage.", Toast.LENGTH_LONG).show();
+            UIHelper.showError(this, "Not enough storage.");
             return;
         }
         Intent intent = new Intent(this, DownloadService.class);

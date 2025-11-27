@@ -28,10 +28,22 @@ class LLMW private constructor(
         }
     }
 
-    fun send(msg: String, mh: MessageHandler) {
+    fun send(
+        msg: String,
+        mh: MessageHandler,
+        temperature: Float = 0.7f,
+        topK: Int = 40,
+        topP: Float = 0.9f,
+        repeatPenalty: Float = 1.1f
+    ) {
         @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch {
-            llamaAndroid.send(msg).collect { mh.h(it) }
+
+            try {
+                llamaAndroid.send(msg).collect { mh.h(it) }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
