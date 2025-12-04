@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/blue"
     android:screenOrientation="portrait"
-    tools:context=".SignUp">
+    tools:context=".ui.activities.SignUpActivity">
 
     <TextView
         android:id="@+id/createTV"

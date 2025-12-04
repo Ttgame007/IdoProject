@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.deta.model;
 
 public class Message {
     private String content;

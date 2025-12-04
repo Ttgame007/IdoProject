@@ -1,12 +1,16 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.utills.helpers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +21,10 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.ido.idoprojectapp.R;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class UIHelper {
 
@@ -138,5 +146,23 @@ public class UIHelper {
             inputLayout.setError(null);
             inputLayout.setErrorEnabled(false);
         }
+    }
+
+    // <=== Image Utills ===>
+
+    public static byte[] bitmapToBytes(Bitmap bitmap) {
+        if (bitmap == null) return null;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    public static Bitmap bytesToBitmap(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) return null;
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    public static Bitmap getBitmapFromUri(Context context, Uri uri) throws IOException {
+        return MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
     }
 }

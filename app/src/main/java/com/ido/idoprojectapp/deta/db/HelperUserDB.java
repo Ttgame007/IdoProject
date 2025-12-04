@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.deta.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
+
+import com.ido.idoprojectapp.deta.model.User;
 
 import java.io.ByteArrayOutputStream;
 

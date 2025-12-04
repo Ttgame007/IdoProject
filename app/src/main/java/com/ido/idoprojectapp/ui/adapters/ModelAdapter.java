@@ -1,6 +1,5 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.ui.adapters;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.ido.idoprojectapp.utills.helpers.CustomDialogHelper;
+import com.ido.idoprojectapp.R;
+import com.ido.idoprojectapp.deta.model.Model;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;

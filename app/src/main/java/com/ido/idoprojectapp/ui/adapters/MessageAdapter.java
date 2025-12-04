@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,11 +8,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ido.idoprojectapp.R;
+import com.ido.idoprojectapp.deta.model.Message;
+
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.massageViewHolder> {
 
-    private List<Message> messages;
+    private final List<Message> messages;
 
     private int lastPosition = -1;
 

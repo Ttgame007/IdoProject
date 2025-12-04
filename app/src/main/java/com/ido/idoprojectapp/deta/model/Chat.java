@@ -1,9 +1,9 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.deta.model;
 
 public class Chat {
-    private String name;
-    private int id;
-    private Model model;
+    private final String name;
+    private final int id;
+    private final Model model;
 
     public Chat(String name, int id, Model model) {
         this.name = name;

@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.services;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -13,6 +13,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import com.ido.idoprojectapp.R;
+import com.ido.idoprojectapp.deta.model.Model;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

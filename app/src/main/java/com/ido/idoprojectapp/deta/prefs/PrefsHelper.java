@@ -1,8 +1,9 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.deta.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import com.google.gson.Gson;
+import com.ido.idoprojectapp.deta.model.Model;
 
 public class PrefsHelper {
     private static final String PREFS_NAME = "user_prefs";

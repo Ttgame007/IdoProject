@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.ui.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.ido.idoprojectapp.R;
+import com.ido.idoprojectapp.deta.model.Chat;
 
 import java.util.List;
 
@@ -17,8 +20,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         void onChatLongClick(Chat chat);
     }
 
-    private List<Chat> chats;
-    private OnChatClickListener listener;
+    private final List<Chat> chats;
+    private final OnChatClickListener listener;
 
     public ChatAdapter(List<Chat> chats, OnChatClickListener listener) {
         this.chats = chats;

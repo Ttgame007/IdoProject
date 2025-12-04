@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.ui.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -30,6 +30,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.ido.idoprojectapp.R;
+import com.ido.idoprojectapp.utills.helpers.UIHelper;
+import com.ido.idoprojectapp.deta.db.HelperUserDB;
+import com.ido.idoprojectapp.deta.prefs.PrefsHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         setupErrorClearer(usernameET, usrInputLayout);
         setupErrorClearer(passET, passInputLayout);
 
-        signUp.setOnClickListener(v -> startActivity(new Intent(this, SignUp.class)));
+        signUp.setOnClickListener(v -> startActivity(new Intent(this, SignUpActivity.class)));
         findViewById(R.id.forgotText).setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));
         thwakz.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org"))));
 

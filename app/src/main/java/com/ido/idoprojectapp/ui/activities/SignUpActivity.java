@@ -1,4 +1,4 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.ui.activities;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -20,10 +20,15 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.ido.idoprojectapp.R;
+import com.ido.idoprojectapp.utills.helpers.UIHelper;
+import com.ido.idoprojectapp.deta.db.HelperUserDB;
+import com.ido.idoprojectapp.deta.model.User;
+import com.ido.idoprojectapp.deta.prefs.PrefsHelper;
 
 import java.util.regex.Pattern;
 
-public class SignUp extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
     ImageButton thwakz;
     TextInputEditText usernameET, emailET, passET, rePassET;

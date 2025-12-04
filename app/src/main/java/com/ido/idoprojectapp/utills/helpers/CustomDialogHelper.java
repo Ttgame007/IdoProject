@@ -1,10 +1,9 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.utills.helpers;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -14,7 +13,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.util.TypedValue;
+
+import com.ido.idoprojectapp.R;
 
 public class CustomDialogHelper {
 

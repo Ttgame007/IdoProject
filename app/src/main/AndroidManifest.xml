@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permissions and Queries remain the same... -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -31,24 +30,28 @@
         android:theme="@style/Theme.Idoprojectapp">
 
         <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ModelSettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AiActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".SignUp"
+            android:name=".ui.activities.ForgotPasswordActivity"
             android:exported="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.ModelSettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.AiActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ui.activities.SignUpActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.MainActivity"
             android:theme="@style/Theme.App.Starting"
             android:exported="true">
             <intent-filter>
@@ -58,7 +61,7 @@
         </activity>
 
         <service
-            android:name=".DownloadService"
+            android:name=".services.DownloadService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />

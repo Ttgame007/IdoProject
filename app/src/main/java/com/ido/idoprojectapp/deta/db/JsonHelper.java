@@ -1,8 +1,10 @@
-package com.ido.idoprojectapp;
+package com.ido.idoprojectapp.deta.db;
 
 import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ido.idoprojectapp.deta.model.Chat;
+import com.ido.idoprojectapp.deta.model.Message;
 
 import java.io.*;
 import java.lang.reflect.Type;
