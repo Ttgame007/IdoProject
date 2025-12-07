@@ -1,5 +1,4 @@
-package com.ido.idoprojectapp
-    .services
+package com.ido.idoprojectapp.services
 
 import android.llama.cpp.LLamaAndroid
 import kotlinx.coroutines.DelicateCoroutinesApi
