@@ -9,7 +9,6 @@ import android.text.TextWatcher;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +29,6 @@ import java.util.regex.Pattern;
 
 public class SignUpActivity extends AppCompatActivity {
 
-    ImageButton thwakz;
     TextInputEditText usernameET, emailET, passET, rePassET;
     TextInputLayout usrInputLayout, emailInputLayout, passInputLayout, rePassInputLayout;
     Button signUp;
@@ -59,7 +57,6 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
-        thwakz = findViewById(R.id.thwakzLogo);
         signUp = findViewById(R.id.signUp);
 
         usernameET = findViewById(R.id.usrET);
@@ -81,7 +78,6 @@ public class SignUpActivity extends AppCompatActivity {
         setupErrorClearer(passET, passInputLayout);
         setupErrorClearer(rePassET, rePassInputLayout);
 
-        thwakz.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org"))));
         signUp.setOnClickListener(v -> validateFields());
     }
 

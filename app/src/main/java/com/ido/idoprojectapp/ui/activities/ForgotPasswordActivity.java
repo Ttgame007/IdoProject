@@ -9,7 +9,6 @@ import android.text.TextWatcher;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +30,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private TextInputEditText etEmail, etNewPass, etConfirmPass;
     private TextInputLayout emailInputLayout, newPassInputLayout, confirmPassInputLayout;
     private Button btnReset;
-    private ImageButton thwakz;
     private HelperUserDB userDb;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^" +
@@ -63,8 +61,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private void initViews() {
         etEmail = findViewById(R.id.etResetEmail);
         emailInputLayout = findViewById(R.id.emailInputLayout);
-        thwakz = findViewById(R.id.thwakzLogo);
-
 
         etNewPass = findViewById(R.id.etNewPassword);
         newPassInputLayout = findViewById(R.id.newPassInputLayout);
@@ -80,7 +76,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         setupErrorClearer(etNewPass, newPassInputLayout);
         setupErrorClearer(etConfirmPass, confirmPassInputLayout);
         btnReset.setOnClickListener(v -> attemptReset());
-        thwakz.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org"))));
     }
 
     private void setupErrorClearer(EditText et, TextInputLayout til) {

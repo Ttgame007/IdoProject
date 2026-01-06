@@ -15,7 +15,6 @@ import android.view.animation.BounceInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import androidx.core.splashscreen.SplashScreen;
@@ -38,7 +37,6 @@ import com.ido.idoprojectapp.deta.prefs.PrefsHelper;
 public class MainActivity extends AppCompatActivity {
 
     Button signIn, signUp;
-    ImageButton thwakz;
     ImageView SignInForeground;
 
     ConstraintLayout mainContent;
@@ -88,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
         SignInForeground = findViewById(R.id.signInForeground);
         layout = findViewById(R.id.layout);
         signUp = findViewById(R.id.signUpText);
-        thwakz = findViewById(R.id.thwakzLogo);
         signIn = findViewById(R.id.signIn);
 
         usernameET = findViewById(R.id.usrET);
@@ -171,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
 
         signUp.setOnClickListener(v -> startActivity(new Intent(this, SignUpActivity.class)));
         findViewById(R.id.forgotText).setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));
-        thwakz.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.thwakz.org"))));
 
         signIn.setOnClickListener(v -> {
             String username = usernameET.getText().toString().trim();
